@@ -7,7 +7,7 @@ Default output is intentionally short:
 - one-sentence summary in Chinese and English
 - a Chinese 90-120 second interview answer
 - a short English version
-- a handwritten Chinese/English Excalidraw script card with blue decision-flow boxes when MCP export is available
+- a direct in-chat preview image of a handwritten Chinese/English Excalidraw script card, plus an editable Excalidraw link when export is available
 - a compact 30-second Chinese version
 - only one follow-up gotcha when it is clearly useful
 
@@ -53,9 +53,11 @@ Use $senior-sde-interview-script to turn this technical excerpt into a senior SD
 
 ## Excalidraw behavior
 
-When Excalidraw MCP tools are available, the skill should call `create_view`, export with `export_to_excalidraw`, and return the Excalidraw URL directly.
+When Excalidraw MCP tools are available, the skill should call `create_view`, export with `export_to_excalidraw`, show a rendered preview image directly in chat, and return the Excalidraw URL as an editable backup.
 
-The default board is a hybrid script card, not a colorful flowchart. It should include the actual Chinese speaking script, a blue decision flow, and the 30-second version inside the drawing. It should use Excalidraw's hand-drawn font style (`fontFamily: 1`) for editable text, plus rendered Chinese handwriting images when CJK glyphs would otherwise fall back to a plain font.
+The default board is a hybrid script card, not a colorful flowchart. It should include the actual Chinese speaking script, a blue decision flow, and the 30-second version inside the drawing. All cards, boxes, and frames should have transparent backgrounds with hand-drawn strokes only. Use black or dark gray strokes for script cards, and blue strokes/text/arrows for decision-flow boxes. Do not use blue or gray fills.
+
+It should use Excalidraw's hand-drawn font style (`fontFamily: 1`) for editable text, plus rendered Chinese handwriting images when CJK glyphs would otherwise fall back to a plain font.
 
 For Chinese handwriting, the skill prefers HanziPen-style rendering and embeds transparent PNG/SVG blocks in the Excalidraw file. This makes Chinese look handwritten too, with the tradeoff that those Chinese blocks are not directly editable as Excalidraw text.
 
@@ -76,6 +78,6 @@ https://excalidraw.com/#json=8gKTecAEUwJp5d7gU9Cuw,AqB6Qd5bVIOuuzx9786Rdw
 - 中文和英文一句话总结
 - 中文 90-120 秒面试版
 - 英文短版
-- 中文也手写的 Excalidraw 讲稿区 + 蓝色判断流程链接，或 `.excalidraw` 文件路径
+- 直接显示在 chat 里的中文手写 Excalidraw 预览图，透明框体 + 蓝色判断流程边框，并附链接或 `.excalidraw` 文件路径作为备份
 - 中文 30 秒短版
 - 必要时只补一个高概率追问点

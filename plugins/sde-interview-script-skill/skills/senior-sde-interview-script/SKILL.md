@@ -16,7 +16,7 @@ Unless the user asks for a different structure, produce:
 - **一句话总结 / One-Sentence Summary**: one short Chinese sentence and one short English sentence explaining what the paragraph is about.
 - **中文面试版**: 2 short Chinese paragraphs, suitable for a 90-120 second spoken answer.
 - **English Short Version**: one short English paragraph with the same judgment and examples, not a literal translation.
-- **Excalidraw Visual**: return a direct Excalidraw share link when tools allow it. The board must include the speakable script text, not just empty concept boxes. Chinese text should look handwritten too, not only English. If MCP export is not available, create a `.excalidraw` file and return the path. Use a Board Brief only as the last fallback.
+- **Excalidraw Visual**: show a rendered preview image directly in chat whenever possible, and include a direct Excalidraw share link as the editable backup. The board must include the speakable script text, not just empty concept boxes. Chinese text should look handwritten too, not only English. If MCP export is not available, create a `.excalidraw` file and return the path. Use a Board Brief only as the last fallback.
 - **30 秒短版**: one compact Chinese answer, at most two sentences.
 - **追问准备 / Follow-Up Prep**: omit by default. Add only one short gotcha when it is highly likely to be asked or the user requests it.
 
@@ -73,8 +73,9 @@ Default to a clean hybrid board:
 
 - white background
 - black or dark gray strokes
-- light gray fills for script and summary cards (`#ffffff`, `#f9fafb`, `#f3f4f6`)
-- blue fills/strokes only for the decision-flow boxes (`#dbeafe`, `#2563eb`)
+- transparent backgrounds for all cards, boxes, and frames (`backgroundColor: transparent`)
+- black or dark gray strokes for script, summary, and 30-second cards
+- blue strokes, text, and arrows only for the decision-flow boxes (`#2563eb`); do not use blue fills
 - no rainbow palettes, decorative colors, or five-color flowcharts
 - Excalidraw handwritten typography and sketch style: set editable text `fontFamily` to `1` for Excalidraw's hand-drawn/Virgil-style font, use rough hand-drawn shapes, and avoid polished slide-deck typography
 
@@ -82,17 +83,24 @@ The diagram should be a **script card plus decision flow**, not a sparse flowcha
 
 - title + one-sentence summary
 - large Chinese interview script block
-- 3-4 blue flow boxes, such as pain, fit, cost, decision
+- 3-4 blue-outlined flow boxes, such as pain, fit, cost, decision
 - compact 30-second version
 
-Put the actual explanation inside the diagram. Do not create empty boxes with only arrows. The blue boxes are for the interviewer's decision framework; the black/gray areas are for the candidate's speakable script.
+Put the actual explanation inside the diagram. Do not create empty boxes with only arrows. The blue-outlined boxes are for the interviewer's decision framework; the black/dark-gray outlined areas are for the candidate's speakable script.
 
 When Excalidraw MCP tools are available:
 
 1. Call `read_me` once if tool usage is unclear.
 2. Create one board with `create_view`.
 3. Export it with `export_to_excalidraw`.
-4. Return the Excalidraw URL directly in the answer.
+4. Generate or capture a preview image and show it directly in chat before the link.
+5. Return the Excalidraw URL as the editable/openable backup.
+
+Chat delivery rule:
+
+- Display the rendered Excalidraw preview image directly in the response using Markdown image syntax whenever possible.
+- Put the Excalidraw URL or `.excalidraw` file path after the image as a backup, not as the primary way to inspect the output.
+- If a preview image cannot be generated, return the link/path and briefly say the preview was unavailable.
 
 For the JSON passed to `export_to_excalidraw`, use real Excalidraw `text` elements for editable text. Do not rely on MCP-only `label` shorthand inside shapes; it can display in the MCP preview but export to excalidraw.com as blank boxes. If using `label` for `create_view`, convert it into explicit text elements before export.
 
@@ -112,7 +120,7 @@ Visual spacing rules:
 - Use comfortable line spacing: `lineHeight` around 1.35-1.5 for script text and 1.25-1.35 for short labels.
 - Prefer fewer wider text lines over dense paragraphs. Add manual line breaks where needed.
 - Keep 40-60 px vertical gaps between major sections.
-- Use Excalidraw's handwritten roughness/hand-drawn feel; set editable text `fontFamily: 1`, use roughness around `1.5-2`, and make the board feel like an Excalidraw note, not a slide deck.
+- Use Excalidraw's handwritten roughness/hand-drawn feel; set editable text `fontFamily: 1`, use roughness around `1.5-2`, keep rectangle backgrounds transparent, and make the board feel like an Excalidraw note, not a slide deck.
 
 When Excalidraw MCP tools are not available:
 
@@ -124,7 +132,7 @@ When Excalidraw MCP tools are not available:
 
 - Be concise and speakable.
 - First line must summarize the paragraph's topic, not describe the response format.
-- Always include a direct Excalidraw URL or a file path when possible.
+- Always include a direct preview image when possible, plus an Excalidraw URL or file path as backup.
 - Use the user's examples when present; add only one small realistic example when needed.
 - Do not over-explain basic definitions.
 - Keep Chinese and English aligned in substance, but let each sound natural.
