@@ -16,7 +16,7 @@ Unless the user asks for a different structure, produce:
 - **一句话总结 / One-Sentence Summary**: one short Chinese sentence and one short English sentence explaining what the paragraph is about.
 - **中文面试版**: 1-2 short Chinese paragraphs, suitable for a 60-90 second spoken answer.
 - **English Short Version**: one short English paragraph with the same judgment and examples, not a literal translation.
-- **Excalidraw Visual**: return a direct Excalidraw share link when tools allow it. If not, create a `.excalidraw` file and return the path. Use a Board Brief only as the last fallback.
+- **Excalidraw Visual**: return a direct Excalidraw share link when tools allow it. The board must include the speakable script text, not just empty concept boxes. If MCP export is not available, create a `.excalidraw` file and return the path. Use a Board Brief only as the last fallback.
 - **30 秒短版**: one compact Chinese answer, at most two sentences.
 - **追问准备 / Follow-Up Prep**: omit by default. Add only one short gotcha when it is highly likely to be asked or the user requests it.
 
@@ -33,7 +33,7 @@ Do not add long explanations about the process. The user wants an interview answ
    - one senior caveat or tradeoff
 4. Reframe the material as a senior candidate evaluating a real design situation.
 5. Add practical depth only when it changes the decision: retries, caching, authorization, consistency, client contracts, observability, or operational cost.
-6. Create the Excalidraw visual and prefer a direct share link.
+6. Create the Excalidraw visual as a monochrome script card and prefer a direct share link.
 7. End with a crisp principle the candidate can remember.
 
 ## Length Budget
@@ -68,6 +68,23 @@ Keep the language plain. Avoid buzzword stacks and concept dumps.
 
 Prefer Excalidraw over Mermaid or generic diagrams. Do not use Mermaid unless the user explicitly asks for Mermaid.
 
+Default to a clean monochrome board:
+
+- white background
+- black or dark gray strokes
+- light gray fills only (`#ffffff`, `#f9fafb`, `#f3f4f6`)
+- one accent color at most, only if it improves scanning
+- no rainbow palettes, decorative colors, or five-color flowcharts
+
+The diagram should be a **script card**, not a sparse flowchart. It must stand on its own when opened:
+
+- title + one-sentence summary
+- large Chinese interview script block
+- 2-3 small judgment blocks, such as decision rule, example, gotcha
+- compact 30-second version
+
+Put the actual explanation inside the diagram. Do not create empty boxes with only arrows.
+
 When Excalidraw MCP tools are available:
 
 1. Call `read_me` once if tool usage is unclear.
@@ -75,16 +92,9 @@ When Excalidraw MCP tools are available:
 3. Export it with `export_to_excalidraw`.
 4. Return the Excalidraw URL directly in the answer.
 
-Use 4-6 blocks:
+For the JSON passed to `export_to_excalidraw`, use real Excalidraw `text` elements for all text. Do not rely on MCP-only `label` shorthand inside shapes; it can display in the MCP preview but export to excalidraw.com as blank boxes. If using `label` for `create_view`, convert it into explicit text elements before export.
 
-- interview question
-- core rule
-- when to use
-- concrete example
-- gotcha or tradeoff
-- takeaway
-
-Use a simple left-to-right or top-to-bottom layout. Connect blocks with arrows that show reasoning. Keep diagram labels very short; English labels are fine for diagrams unless the user asks for Chinese labels. Do not put paragraphs in the drawing.
+Use a simple top-to-bottom layout. Keep text readable and non-overlapping. Chinese labels and script are the default for diagrams unless the user asks for English-only.
 
 When Excalidraw MCP tools are not available:
 

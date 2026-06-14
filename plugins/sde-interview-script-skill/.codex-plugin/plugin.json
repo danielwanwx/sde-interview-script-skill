@@ -30,9 +30,9 @@
       "Interview Prep"
     ],
     "defaultPrompt": [
-      "Create a concise SDE answer and Excalidraw link.",
+      "Create a concise SDE answer and Excalidraw script card.",
       "Turn this excerpt into a 90-second interview answer.",
-      "Draw the concept in Excalidraw and give the link."
+      "Draw a monochrome Excalidraw card with the script."
     ],
     "brandColor": "#2563EB"
   },
