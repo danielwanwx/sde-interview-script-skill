@@ -1,7 +1,7 @@
 interface:
   display_name: "Senior SDE Interview Script"
   short_description: "Concise SDE scripts with Excalidraw links"
-  default_prompt: "Use $senior-sde-interview-script to create a concise answer and monochrome Excalidraw script card."
+  default_prompt: "Use $senior-sde-interview-script to create a senior answer and Excalidraw script card with blue decision flow."
 dependencies:
   tools:
     - type: "mcp"

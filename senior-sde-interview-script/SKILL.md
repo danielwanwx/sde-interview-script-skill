@@ -1,6 +1,6 @@
 ---
 name: senior-sde-interview-script
-description: "Convert Hello Interview excerpts, system design notes, API design notes, or other technical interview material into short senior SDE interview speaking scripts plus direct Excalidraw visual links when possible. Use when the user provides source paragraphs and asks for a concise speakable interview answer, memorization-friendly draft, bilingual Chinese/English version, 30-second version, Excalidraw diagram, or asks to preserve this response pattern. Also use when the user wants answers to sound senior, solid, practical, and opinionated without becoming textbook-like, overly long, or overly autobiographical."
+description: "Convert Hello Interview excerpts, system design notes, API design notes, or other technical interview material into senior SDE interview speaking scripts plus direct Excalidraw visual links when possible. Use when the user provides source paragraphs and asks for a concise but solid speakable interview answer, memorization-friendly draft, bilingual Chinese/English version, 30-second version, Excalidraw diagram, or asks to preserve this response pattern. Also use when the user wants answers to sound senior, practical, opinionated, and interview-ready without becoming textbook-like, overly long, or overly autobiographical."
 ---
 
 # Senior SDE Interview Script
@@ -14,7 +14,7 @@ Turn technical source material into a short answer a senior SDE candidate can ac
 Unless the user asks for a different structure, produce:
 
 - **一句话总结 / One-Sentence Summary**: one short Chinese sentence and one short English sentence explaining what the paragraph is about.
-- **中文面试版**: 1-2 short Chinese paragraphs, suitable for a 60-90 second spoken answer.
+- **中文面试版**: 2 short Chinese paragraphs, suitable for a 90-120 second spoken answer.
 - **English Short Version**: one short English paragraph with the same judgment and examples, not a literal translation.
 - **Excalidraw Visual**: return a direct Excalidraw share link when tools allow it. The board must include the speakable script text, not just empty concept boxes. If MCP export is not available, create a `.excalidraw` file and return the path. Use a Board Brief only as the last fallback.
 - **30 秒短版**: one compact Chinese answer, at most two sentences.
@@ -26,19 +26,20 @@ Do not add long explanations about the process. The user wants an interview answ
 
 1. Infer the likely interview question behind the excerpt.
 2. Start with one concise Chinese summary sentence and one concise English summary sentence.
-3. Extract only 3-4 interview-useful points:
+3. Extract only 4-5 interview-useful points:
    - the decision rule
    - when to use it
    - one realistic example
    - one senior caveat or tradeoff
+   - one production implication when it changes the decision
 4. Reframe the material as a senior candidate evaluating a real design situation.
 5. Add practical depth only when it changes the decision: retries, caching, authorization, consistency, client contracts, observability, or operational cost.
-6. Create the Excalidraw visual as a monochrome script card and prefer a direct share link.
+6. Create the Excalidraw visual as a hybrid script card with a blue decision flow and prefer a direct share link.
 7. End with a crisp principle the candidate can remember.
 
 ## Length Budget
 
-- Chinese live answer: max 2 short paragraphs.
+- Chinese live answer: 90-120 seconds, usually 2 short paragraphs.
 - English answer: max 1 short paragraph.
 - 30-second version: max 2 Chinese sentences.
 - Follow-up prep: omit unless asked, or include exactly one obvious gotcha.
@@ -68,22 +69,22 @@ Keep the language plain. Avoid buzzword stacks and concept dumps.
 
 Prefer Excalidraw over Mermaid or generic diagrams. Do not use Mermaid unless the user explicitly asks for Mermaid.
 
-Default to a clean monochrome board:
+Default to a clean hybrid board:
 
 - white background
 - black or dark gray strokes
-- light gray fills only (`#ffffff`, `#f9fafb`, `#f3f4f6`)
-- one accent color at most, only if it improves scanning
+- light gray fills for script and summary cards (`#ffffff`, `#f9fafb`, `#f3f4f6`)
+- blue fills/strokes only for the decision-flow boxes (`#dbeafe`, `#2563eb`)
 - no rainbow palettes, decorative colors, or five-color flowcharts
 
-The diagram should be a **script card**, not a sparse flowchart. It must stand on its own when opened:
+The diagram should be a **script card plus decision flow**, not a sparse flowchart. It must stand on its own when opened:
 
 - title + one-sentence summary
 - large Chinese interview script block
-- 2-3 small judgment blocks, such as decision rule, example, gotcha
+- 3-4 blue flow boxes, such as pain, fit, cost, decision
 - compact 30-second version
 
-Put the actual explanation inside the diagram. Do not create empty boxes with only arrows.
+Put the actual explanation inside the diagram. Do not create empty boxes with only arrows. The blue boxes are for the interviewer's decision framework; the black/gray areas are for the candidate's speakable script.
 
 When Excalidraw MCP tools are available:
 
@@ -94,7 +95,7 @@ When Excalidraw MCP tools are available:
 
 For the JSON passed to `export_to_excalidraw`, use real Excalidraw `text` elements for all text. Do not rely on MCP-only `label` shorthand inside shapes; it can display in the MCP preview but export to excalidraw.com as blank boxes. If using `label` for `create_view`, convert it into explicit text elements before export.
 
-Use a simple top-to-bottom layout. Keep text readable and non-overlapping. Chinese labels and script are the default for diagrams unless the user asks for English-only.
+Use a simple top-to-bottom layout: script block first, blue decision flow second, 30-second version last. Keep text readable and non-overlapping. Chinese labels and script are the default for diagrams unless the user asks for English-only.
 
 When Excalidraw MCP tools are not available:
 
