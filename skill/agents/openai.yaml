@@ -1,0 +1,4 @@
+interface:
+  display_name: "Senior SDE Interview Script"
+  short_description: "Turn notes into bilingual senior interview scripts"
+  default_prompt: "Use $senior-sde-interview-script to summarize this technical excerpt in Chinese and English, then turn it into concise bilingual senior SDE interview answers."
