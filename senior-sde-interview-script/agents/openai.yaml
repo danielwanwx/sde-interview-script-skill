@@ -1,11 +1,4 @@
 interface:
   display_name: "Senior SDE Interview Script"
   short_description: "SDE scripts as Excalidraw screenshots and links"
-  default_prompt: "Use $senior-sde-interview-script to create a senior SDE Excalidraw screenshot and link only."
-dependencies:
-  tools:
-    - type: "mcp"
-      value: "excalidraw"
-      description: "Excalidraw MCP server for drawing and exporting interview boards"
-      transport: "streamable_http"
-      url: "https://mcp.excalidraw.com/mcp"
+  default_prompt: "Use $senior-sde-interview-script to create a senior SDE Excalidraw-style preview image and link only."

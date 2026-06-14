@@ -1,0 +1,33 @@
+{
+  "name": "sde-interview-script-skill",
+  "owner": {
+    "name": "Daniel Wan"
+  },
+  "description": "Senior SDE interview scripts rendered as Excalidraw-style cards.",
+  "plugins": [
+    {
+      "name": "sde-interview-script-skill",
+      "source": "./plugins/sde-interview-script-skill",
+      "description": "Turn technical interview excerpts into concise senior SDE speaking scripts embedded in Excalidraw visuals.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Daniel Wan"
+      },
+      "homepage": "https://github.com/danielwanwx/sde-interview-script-skill",
+      "repository": "https://github.com/danielwanwx/sde-interview-script-skill",
+      "license": "MIT",
+      "keywords": [
+        "interview",
+        "system-design",
+        "excalidraw",
+        "skill"
+      ],
+      "category": "productivity",
+      "tags": [
+        "interview-prep",
+        "excalidraw",
+        "skills"
+      ]
+    }
+  ]
+}

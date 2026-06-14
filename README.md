@@ -1,79 +1,178 @@
 # SDE Interview Script Skill
 
-A Codex skill and plugin for turning technical interview excerpts into senior SDE speaking scripts embedded in Excalidraw visuals, with screenshot-and-link-only chat replies by default.
+A cross-agent plugin/skill package for turning technical interview excerpts into senior SDE speaking scripts embedded in Excalidraw-style visuals.
 
-Default chat output is intentionally minimal:
+Default output is intentionally minimal:
 
-- a direct in-chat preview image of the handwritten Excalidraw script card
-- an editable Excalidraw link, or a `.excalidraw` file path as backup
+- a direct preview image when the host can display local images
+- an editable Excalidraw link when upload succeeds
+- a local `.excalidraw` path as fallback
 
-The generated board itself contains the one-sentence summary, Chinese interview answer, compact decision flow, and 30-second version. The chat reply should not repeat that text unless the user explicitly asks for copyable text.
+The generated board contains the one-sentence summary, Chinese interview answer, compact decision flow, and 30-second version. The chat reply should not repeat that text unless the user explicitly asks for copyable text.
 
-## Install as a plugin
+## Recommended Architecture
 
-The plugin includes the skill plus an Excalidraw MCP server declaration.
+The best compatibility model is:
 
-Add this repo as a Codex plugin marketplace:
+1. **Plugin manifests per host**: Codex, Cursor, and Claude Code each get their own marketplace/plugin manifest.
+2. **One shared Agent Skill**: all hosts load the same `skills/senior-sde-interview-script/SKILL.md` workflow.
+3. **Bundled renderer scripts**: the agent writes a small content JSON, then runs `scripts/render_interview_card.py` to generate the preview SVG, `.excalidraw` file, and optional Excalidraw share link.
+4. **Optional MCP**: Excalidraw MCP is declared for hosts that support it, but it is not required for the main flow.
+
+This is deliberately not a `rules` or `CLAUDE.md` package. Rules are too host-specific and passive; plugin + skill packaging gives installable discovery, namespaced invocation, bundled scripts, and optional MCP wiring.
+
+## Repository Layout
+
+```text
+.agents/plugins/marketplace.json                     # Codex marketplace
+.cursor-plugin/marketplace.json                      # Cursor marketplace
+.claude-plugin/marketplace.json                      # Claude Code marketplace
+plugins/sde-interview-script-skill/
+  .codex-plugin/plugin.json
+  .cursor-plugin/plugin.json
+  .claude-plugin/plugin.json
+  .mcp.json                                          # Claude/Codex MCP config
+  mcp.json                                           # Cursor MCP config
+  skills/senior-sde-interview-script/
+    SKILL.md
+    scripts/render_interview_card.py
+    scripts/share_excalidraw.mjs
+senior-sde-interview-script/                         # standalone skill copy
+scripts/                                             # repo-level renderer test copy
+```
+
+## End-To-End Flow
+
+After the plugin or skill is installed in a host:
+
+1. User pastes a Hello Interview/API/system-design paragraph.
+2. The agent invokes `senior-sde-interview-script`.
+3. The skill tells the agent to create a compact JSON object:
+
+```json
+{
+  "title": "GraphQL",
+  "summary": "一句话中文总结；one short English summary.",
+  "script": "90-120 秒中文面试可讲版，2 个短段落。",
+  "short": "30 秒中文短版，最多 2 句。",
+  "flows": ["痛点", "适用场景", "代价", "结论"]
+}
+```
+
+4. The agent runs the bundled renderer:
+
+```bash
+python3 scripts/render_interview_card.py \
+  --content /tmp/interview-card.json \
+  --out /tmp/interview-card \
+  --slug interview-card
+```
+
+5. The renderer writes:
+
+```json
+{
+  "preview": "/tmp/interview-card/interview-card-preview.svg",
+  "excalidraw": "/tmp/interview-card/interview-card.excalidraw",
+  "link": "https://excalidraw.com/#json=..."
+}
+```
+
+6. Codex/Cursor reply with only the preview image and link/path. Claude Code terminal replies with the link first, then local paths if needed.
+
+## Install In Codex
+
+Add this repository as a Codex plugin marketplace:
 
 ```bash
 codex plugin marketplace add danielwanwx/sde-interview-script-skill
 ```
 
-Then open the plugin directory in Codex, choose the `SDE Interview Script Skills` marketplace, and install `SDE Interview Script`.
+Then install `SDE Interview Script` from the `SDE Interview Script Skills` marketplace.
 
-After installing, ask:
+Prompt:
 
 ```text
-Use $senior-sde-interview-script to turn this excerpt into a senior SDE answer and Excalidraw card.
+Use $senior-sde-interview-script to turn this excerpt into a senior SDE Excalidraw-style preview image and link only.
 ```
 
-## Install as a skill only
+## Install In Cursor
 
-If you only want the prompt workflow without plugin packaging, install the skill directly:
+This repo includes Cursor marketplace and plugin manifests:
+
+- `.cursor-plugin/marketplace.json`
+- `plugins/sde-interview-script-skill/.cursor-plugin/plugin.json`
+
+Import the repository as a Cursor plugin marketplace or team plugin source. The plugin loads:
+
+- `skills/`
+- optional `mcp.json`
+- bundled renderer scripts under the skill
+
+After installation, paste the excerpt and ask Cursor to use the `senior-sde-interview-script` skill. Cursor-capable chats should display the local preview image plus the Excalidraw link/path.
+
+## Install In Claude Code
+
+This repo includes Claude Code marketplace and plugin manifests:
+
+- `.claude-plugin/marketplace.json`
+- `plugins/sde-interview-script-skill/.claude-plugin/plugin.json`
+
+For local testing:
+
+```bash
+claude --plugin-dir ./plugins/sde-interview-script-skill
+```
+
+Marketplace install flow:
+
+```text
+/plugin marketplace add danielwanwx/sde-interview-script-skill
+/plugin install sde-interview-script-skill@sde-interview-script-skill
+```
+
+Claude Code plugin skills are namespaced, so invoke:
+
+```text
+/sde-interview-script-skill:senior-sde-interview-script <paste excerpt here>
+```
+
+Claude Code terminal usually cannot inline local images, so the skill defaults to returning the Excalidraw link. If upload is unavailable, it returns the local preview SVG and `.excalidraw` paths.
+
+## Standalone Skill
+
+If you only want the skill folder:
 
 ```text
 Use $skill-installer to install https://github.com/danielwanwx/sde-interview-script-skill/tree/main/senior-sde-interview-script
 ```
 
-Or copy the skill folder manually:
+Or copy it manually into the host's skill directory.
+
+## Local Renderer Test
+
+Create a content JSON and run:
 
 ```bash
-mkdir -p ~/.codex/skills
-git clone https://github.com/danielwanwx/sde-interview-script-skill.git /tmp/sde-interview-script-skill
-cp -R /tmp/sde-interview-script-skill/senior-sde-interview-script ~/.codex/skills/
+python3 scripts/render_interview_card.py \
+  --content /tmp/interview-card.json \
+  --out /tmp/interview-card \
+  --slug interview-card
 ```
 
-Then start a new Codex session and invoke:
+The script uses only Python standard library. If Node.js and network access are available, it also uploads the `.excalidraw` scene to Excalidraw's share endpoint. Without Node.js or network access, the local preview SVG and `.excalidraw` file still work.
 
-```text
-Use $senior-sde-interview-script to turn this technical excerpt into a senior SDE interview answer and Excalidraw visual.
-```
+## Practical Limit
 
-## Excalidraw behavior
-
-When Excalidraw MCP tools are available, the skill should call `create_view`, export with `export_to_excalidraw`, show a rendered preview image directly in chat, and return the Excalidraw URL as an editable backup. By default, the final response should only contain the screenshot and link/path.
-
-The default board is a hybrid script card, not a colorful flowchart. It should include the actual Chinese speaking script, a blue decision flow, and the 30-second version inside the drawing. All cards, boxes, and frames should have transparent backgrounds with hand-drawn strokes only. Use black or dark gray strokes for script cards, and blue strokes/text/arrows for decision-flow boxes. Do not use blue or gray fills.
-
-It should use Excalidraw's hand-drawn font style (`fontFamily: 1`) for editable text, plus rendered Chinese handwriting images when CJK glyphs would otherwise fall back to a plain font.
-
-For Chinese handwriting, the skill prefers HanziPen-style rendering and embeds transparent PNG/SVG blocks in the Excalidraw file. This makes Chinese look handwritten too, with the tradeoff that those Chinese blocks are not directly editable as Excalidraw text.
-
-When exporting to excalidraw.com, editable text must be real Excalidraw `text` elements. Do not rely on MCP-only `label` shorthand in shapes, because it can export as blank boxes. If Chinese handwriting is embedded as image blocks, the share-link export must also include/upload the related `files` data, otherwise the opened link can show blank image placeholders.
-
-When Excalidraw MCP tools are unavailable, it should create a `.excalidraw` file and return the file path. It should output an Excalidraw Board Brief only if neither direct export nor file creation is available.
-
-Example GraphQL test link:
-
-https://excalidraw.com/#json=8gKTecAEUwJp5d7gU9Cuw,AqB6Qd5bVIOuuzx9786Rdw
+No agent host should auto-enable arbitrary cloned plugins without user trust. So a literal zero-click install after `git clone` is not realistic across Codex, Cursor, and Claude Code. The closest safe, portable target is what this repo implements: once the host imports or installs the plugin, the actual user workflow is copy paragraph in, get preview image plus link out.
 
 ## 中文说明
 
-这个 Codex skill/plugin 会把技术面试材料转换成 senior SDE candidate 可以直接讲的短答案，并优先生成可以直接打开的 Excalidraw 链接。
+这个 repo 不是单纯的 prompt 或规则文件，而是跨宿主的 plugin + skill 包：
 
-默认输出包括：
+- Codex 用 `.agents` / `.codex-plugin`
+- Cursor 用 `.cursor-plugin`
+- Claude Code 用 `.claude-plugin`
+- 三者共享同一个 `SKILL.md` 和渲染脚本
 
-- 直接显示在 chat 里的中文手写 Excalidraw 截图
-- Excalidraw 链接或 `.excalidraw` 文件路径作为备份
-
-讲稿正文、30 秒短版、判断流程都放在图里；除非明确要求可复制文本，回复里不重复展开。
+安装后，用户只需要粘贴原文段落，agent 会自动生成简短但有 senior 深度的中文面试讲稿，并把讲稿、判断流程和 30 秒短版放进 Excalidraw 风格图片里。聊天回复默认只给图片和链接。

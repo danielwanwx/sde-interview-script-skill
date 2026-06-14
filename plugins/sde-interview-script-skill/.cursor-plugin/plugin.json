@@ -1,0 +1,28 @@
+{
+  "name": "sde-interview-script-skill",
+  "displayName": "SDE Interview Script",
+  "version": "0.2.0",
+  "description": "Generate senior SDE interview scripts as Excalidraw-style preview images plus editable links.",
+  "author": {
+    "name": "Daniel Wan"
+  },
+  "homepage": "https://github.com/danielwanwx/sde-interview-script-skill",
+  "repository": "https://github.com/danielwanwx/sde-interview-script-skill",
+  "license": "MIT",
+  "keywords": [
+    "cursor",
+    "skill",
+    "plugin",
+    "interview",
+    "system-design",
+    "excalidraw"
+  ],
+  "category": "productivity",
+  "tags": [
+    "interview-prep",
+    "system-design",
+    "excalidraw"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./mcp.json"
+}

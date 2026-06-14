@@ -69,6 +69,8 @@ Keep the language plain. Avoid buzzword stacks and concept dumps.
 
 Prefer Excalidraw over Mermaid or generic diagrams. Do not use Mermaid unless the user explicitly asks for Mermaid.
 
+Use the bundled renderer first when filesystem access is available. It is colocated with this `SKILL.md` at `scripts/render_interview_card.py` and keeps layout, CJK handwriting, transparent frames, preview generation, and Excalidraw sharing consistent across Codex, Cursor, and Claude Code. Excalidraw MCP is optional; use it only as an enhancement or fallback when the user explicitly wants live MCP drawing.
+
 Default to a clean hybrid board:
 
 - white background
@@ -88,7 +90,36 @@ The diagram should be a **script card plus decision flow**, not a sparse flowcha
 
 Put the actual explanation inside the diagram. Do not create empty boxes with only arrows. The blue-outlined boxes are for the interviewer's decision framework; the black/dark-gray outlined areas are for the candidate's speakable script.
 
-When Excalidraw MCP tools are available:
+Bundled renderer workflow:
+
+1. Produce a compact content JSON object with this exact shape:
+
+```json
+{
+  "title": "GraphQL",
+  "summary": "一句话中文总结；one short English summary.",
+  "script": "90-120 秒中文面试可讲版，2 个短段落。",
+  "short": "30 秒中文短版，最多 2 句。",
+  "flows": [
+    "痛点 / signal",
+    "适用场景 / fit",
+    "代价 / tradeoff",
+    "结论 / decision"
+  ]
+}
+```
+
+2. Run the renderer from the skill folder, using an absolute path if the current working directory is not the skill folder:
+
+```bash
+python3 scripts/render_interview_card.py --content /tmp/interview-card.json --out /tmp/interview-card --slug interview-card
+```
+
+3. Read the emitted result JSON from stdout. It contains `preview`, `excalidraw`, `link`, and `share`.
+4. In Codex or Cursor, return exactly a Markdown image for `preview`, then the `link` if present, otherwise the `.excalidraw` path.
+5. In Claude Code or any terminal-only host that cannot inline local images, return the `link` first. If no link is available, return the `preview` and `.excalidraw` paths. Do not paste the script text outside the image unless the user explicitly asks.
+
+When Excalidraw MCP tools are available and the bundled renderer cannot be used:
 
 1. Call `read_me` once if tool usage is unclear.
 2. Create one board with `create_view`.
@@ -114,7 +145,7 @@ Chinese handwriting rule:
 - When the user wants Chinese to look handwritten, render Chinese text blocks as transparent PNG or SVG using a Chinese handwriting-style font, then embed them as Excalidraw `image` elements with `files` data URLs.
 - Prefer `HanziPen SC` / `Hanzipen.ttc` when available on macOS. Fall back to `Kaiti`, `Yuanti`, or editable `fontFamily: 1` text only when no suitable Chinese handwriting font is available.
 - When exporting a share link with image-rendered Chinese, make sure the image files are included in the `.excalidraw` `files` map and uploaded/saved with the share link; otherwise excalidraw.com can open the board with blank image placeholders.
-- Keep the original Chinese script in the chat response because image-rendered Chinese in Excalidraw is not directly editable as text.
+- Keep the original Chinese script in the content JSON and generated artifacts, but do not repeat it in the chat response by default.
 
 Use a simple top-to-bottom layout: script block first, blue decision flow second, 30-second version last. Keep text readable and non-overlapping. Chinese labels and script are the default for diagrams unless the user asks for English-only.
 
