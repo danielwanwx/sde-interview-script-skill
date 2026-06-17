@@ -1,7 +1,7 @@
 {
   "name": "sde-interview-script-skill",
-  "version": "0.3.0",
-  "description": "Generate language-selectable senior SDE interview scripts as Excalidraw-style preview images plus editable links.",
+  "version": "0.4.0",
+  "description": "Generate language-selectable Excalidraw-style script cards from pasted text, with a short $card entrypoint.",
   "author": {
     "name": "Daniel Wan",
     "url": "https://github.com/danielwanwx"
@@ -19,19 +19,20 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "SDE Interview Script",
-    "shortDescription": "SDE scripts plus Excalidraw cards.",
-    "longDescription": "Turn technical interview excerpts into English-default or user-selected-language senior SDE speaking scripts embedded in handwritten Excalidraw-style boards, then reply with only the preview image and editable link by default.",
+    "displayName": "Script Card",
+    "shortDescription": "Text to Excalidraw cards.",
+    "longDescription": "Turn pasted text into English-default or user-selected-language speakable scripts embedded in handwritten Excalidraw-style boards. Use the short $card skill for general text, or the SDE preset for interview prep.",
     "developerName": "Daniel Wan",
     "category": "Productivity",
     "capabilities": [
       "Multilingual",
       "Excalidraw",
-      "Interview Prep"
+      "Interview Prep",
+      "Study Notes"
     ],
     "defaultPrompt": [
-      "Create a senior SDE Excalidraw preview image and link only. Default to English unless a language is specified.",
-      "Turn this excerpt into a 90-120 second interview answer in Chinese.",
+      "Use $card to turn this text into an Excalidraw-style preview image and link only.",
+      "Use $card in Chinese.",
       "Draw an Excalidraw card with a blue decision flow."
     ],
     "brandColor": "#2563EB"

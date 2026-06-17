@@ -1,7 +1,7 @@
 {
   "name": "sde-interview-script-skill",
   "interface": {
-    "displayName": "SDE Interview Script Skills"
+    "displayName": "Script Card Skills"
   },
   "plugins": [
     {
