@@ -82,6 +82,7 @@ Renderer invariants:
 
 - Text must fit inside its parent block; blocks grow vertically when needed.
 - Connectors leave from block edges and route around unrelated blocks.
+- Connectors should leave and enter block edges perpendicularly using short port stubs; avoid long segments that run parallel against a block border.
 - Connector labels avoid blocks where possible.
 - Decorative icons are opt-in, because they reduce text width and increase overlap risk.
 

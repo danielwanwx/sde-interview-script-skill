@@ -890,20 +890,84 @@ def orthogonal_points(
     src: tuple[float, float, float, float],
     dst: tuple[float, float, float, float],
     routing: str = "auto",
+    stub: float = 38,
 ) -> list[list[float]]:
-    x1, y1, x2, y2 = connector_points(src, dst, routing)
     routing = routing.lower()
-    if routing in {"vertical", "top-bottom", "top_bottom", "tb"}:
-        mid_y = y1 + (y2 - y1) / 2
-        return [[x1, y1], [x1, mid_y], [x2, mid_y], [x2, y2]]
+    start, start_normal, end, end_normal, primary_axis = connector_ports(src, dst, routing)
+    start_stub = [start[0] + start_normal[0] * stub, start[1] + start_normal[1] * stub]
+    end_stub = [end[0] + end_normal[0] * stub, end[1] + end_normal[1] * stub]
+
+    if primary_axis == "vertical":
+        mid_y = start_stub[1] + (end_stub[1] - start_stub[1]) / 2
+        points = [start, start_stub, [start_stub[0], mid_y], [end_stub[0], mid_y], end_stub, end]
+    else:
+        mid_x = start_stub[0] + (end_stub[0] - start_stub[0]) / 2
+        points = [start, start_stub, [mid_x, start_stub[1]], [mid_x, end_stub[1]], end_stub, end]
+    return dedupe_points(points)
+
+
+def connector_ports(
+    src: tuple[float, float, float, float],
+    dst: tuple[float, float, float, float],
+    routing: str = "auto",
+) -> tuple[list[float], tuple[int, int], list[float], tuple[int, int], str]:
+    sx, sy, sw, sh = src
+    dx, dy, dw, dh = dst
+    scx, scy = sx + sw / 2, sy + sh / 2
+    dcx, dcy = dx + dw / 2, dy + dh / 2
+    horizontal_gap = max(dx - (sx + sw), sx - (dx + dw), 0)
+    vertical_gap = max(dy - (sy + sh), sy - (dy + dh), 0)
+    routing = routing.lower()
+
     if routing in {"horizontal", "left-right", "left_right", "lr"}:
-        mid_x = x1 + (x2 - x1) / 2
-        return [[x1, y1], [mid_x, y1], [mid_x, y2], [x2, y2]]
-    if abs(x2 - x1) >= abs(y2 - y1):
-        mid_x = x1 + (x2 - x1) / 2
-        return [[x1, y1], [mid_x, y1], [mid_x, y2], [x2, y2]]
-    mid_y = y1 + (y2 - y1) / 2
-    return [[x1, y1], [x1, mid_y], [x2, mid_y], [x2, y2]]
+        primary_axis = "horizontal"
+    elif routing in {"vertical", "top-bottom", "top_bottom", "tb"}:
+        primary_axis = "vertical"
+    elif vertical_gap >= 36:
+        primary_axis = "vertical"
+    elif horizontal_gap > 0:
+        primary_axis = "horizontal"
+    elif vertical_gap > 0:
+        primary_axis = "vertical"
+    else:
+        primary_axis = "horizontal" if abs(dcx - scx) >= abs(dcy - scy) else "vertical"
+
+    if primary_axis == "vertical":
+        if dcy >= scy:
+            return [scx, sy + sh], (0, 1), [dcx, dy], (0, -1), primary_axis
+        return [scx, sy], (0, -1), [dcx, dy + dh], (0, 1), primary_axis
+
+    if dcx >= scx:
+        return [sx + sw, scy], (1, 0), [dx, dcy], (-1, 0), primary_axis
+    return [sx, scy], (-1, 0), [dx + dw, dcy], (1, 0), primary_axis
+
+
+def simplify_points(points: list[list[float]]) -> list[list[float]]:
+    simplified: list[list[float]] = []
+    for point in points:
+        item = [float(point[0]), float(point[1])]
+        if simplified and abs(simplified[-1][0] - item[0]) < 0.001 and abs(simplified[-1][1] - item[1]) < 0.001:
+            continue
+        if len(simplified) >= 2:
+            prev = simplified[-1]
+            prev_prev = simplified[-2]
+            if (abs(prev_prev[0] - prev[0]) < 0.001 and abs(prev[0] - item[0]) < 0.001) or (
+                abs(prev_prev[1] - prev[1]) < 0.001 and abs(prev[1] - item[1]) < 0.001
+            ):
+                simplified[-1] = item
+                continue
+        simplified.append(item)
+    return simplified
+
+
+def dedupe_points(points: list[list[float]]) -> list[list[float]]:
+    deduped: list[list[float]] = []
+    for point in points:
+        item = [float(point[0]), float(point[1])]
+        if deduped and abs(deduped[-1][0] - item[0]) < 0.001 and abs(deduped[-1][1] - item[1]) < 0.001:
+            continue
+        deduped.append(item)
+    return deduped
 
 
 def inflated_rect(
@@ -958,11 +1022,21 @@ def route_around_obstacles(
     canvas_width: float = 1500,
 ) -> list[list[float]]:
     base = orthogonal_points(src, dst, routing)
+    for stub in (38, 26, 16, 8):
+        candidate = orthogonal_points(src, dst, routing, stub=stub)
+        fixed_segments_clear = True
+        if len(candidate) > 2:
+            fixed_segments_clear = segment_clear(candidate[0], candidate[1], obstacles) and segment_clear(candidate[-2], candidate[-1], obstacles)
+        if fixed_segments_clear:
+            base = candidate
+            break
     if all(segment_clear(base[index], base[index + 1], obstacles) for index in range(len(base) - 1)):
         return base
 
-    start = base[0]
-    end = base[-1]
+    start_port = base[0]
+    end_port = base[-1]
+    start = base[1] if len(base) > 2 else base[0]
+    end = base[-2] if len(base) > 2 else base[-1]
     xs = {round(start[0], 1), round(end[0], 1), 40.0, round(canvas_width - 40, 1)}
     ys = {round(start[1], 1), round(end[1], 1)}
     for x, y, w, h in obstacles:
@@ -1037,19 +1111,8 @@ def route_around_obstacles(
         cursor = previous.get(cursor)
     route.reverse()
 
-    simplified: list[list[float]] = []
-    for point in route:
-        item = [float(point[0]), float(point[1])]
-        if len(simplified) >= 2:
-            prev = simplified[-1]
-            prev_prev = simplified[-2]
-            if (abs(prev_prev[0] - prev[0]) < 0.001 and abs(prev[0] - item[0]) < 0.001) or (
-                abs(prev_prev[1] - prev[1]) < 0.001 and abs(prev[1] - item[1]) < 0.001
-            ):
-                simplified[-1] = item
-                continue
-        simplified.append(item)
-    return simplified
+    routed = simplify_points([[float(point[0]), float(point[1])] for point in route])
+    return dedupe_points([start_port, *routed, end_port])
 
 
 def route_connector_points(
@@ -1060,7 +1123,7 @@ def route_connector_points(
     canvas_width: float,
 ) -> list[list[float]]:
     obstacles = [
-        inflated_rect(pos, 18)
+        inflated_rect(pos, 12)
         for block_id, pos in positions.items()
         if block_id not in {src_id, dst_id}
     ]
@@ -1103,14 +1166,37 @@ def choose_label_position(
     candidates.append((mid[0] - label_block["width"] / 2, mid[1] - label_block["height"] / 2))
 
     inflated = [inflated_rect(obstacle, 8) for obstacle in obstacles]
+
+    def usable(candidate_x: float, candidate_y: float) -> bool:
+        bounds = label_bounds(candidate_x, candidate_y, label_block)
+        if candidate_x < 10 or candidate_x + label_block["width"] > canvas_width - 10:
+            return False
+        return not any(rects_overlap(bounds, obstacle) for obstacle in inflated)
+
     for x, y in candidates:
         x += dx
         y += dy
-        bounds = label_bounds(x, y, label_block)
-        if x < 10 or x + label_block["width"] > canvas_width - 10:
-            continue
-        if not any(rects_overlap(bounds, obstacle) for obstacle in inflated):
+        if usable(x, y):
             return x, y
+
+    base_candidates = list(candidates)
+    for radius in (32, 64, 96, 132, 176):
+        offsets = [
+            (0, -radius),
+            (0, radius),
+            (-radius, 0),
+            (radius, 0),
+            (-radius, -radius),
+            (radius, -radius),
+            (-radius, radius),
+            (radius, radius),
+        ]
+        for base_x, base_y in base_candidates:
+            for ox, oy in offsets:
+                x = base_x + dx + ox
+                y = base_y + dy + oy
+                if usable(x, y):
+                    return x, y
     x, y = candidates[-1]
     return x + dx, y + dy
 
@@ -1852,6 +1938,7 @@ def build_whiteboard_scene(content: dict[str, Any], slug: str) -> tuple[dict[str
             for idx in range(len(blocks) - 1):
                 connectors.append({"from": blocks[idx]["id"], "to": blocks[idx + 1]["id"]})
 
+    connector_label_max_y = y_cursor
     for index, connector in enumerate(connectors):
         src = str(connector.get("from") or connector.get("source") or "")
         dst = str(connector.get("to") or connector.get("target") or "")
@@ -1872,7 +1959,7 @@ def build_whiteboard_scene(content: dict[str, Any], slug: str) -> tuple[dict[str
             continue
         if src in positions and dst in positions and not connector.get("preserve_points"):
             connector_obstacles = [
-                inflated_rect(pos, 18)
+                inflated_rect(pos, 12)
                 for block_id, pos in positions.items()
                 if block_id not in {src, dst}
             ]
@@ -1913,10 +2000,12 @@ def build_whiteboard_scene(content: dict[str, Any], slug: str) -> tuple[dict[str
                 now,
             )
             elements[-1]["customData"].update({"role": "connector_label", "from": src, "to": dst})
+            connector_label_max_y = max(connector_label_max_y, label_y + label_block["height"])
 
     max_y = max(
         max((y + h for x, y, w, h in positions.values()), default=y_cursor),
         max((float(frame["y"]) + float(frame["h"]) for frame in module_frames), default=y_cursor),
+        connector_label_max_y,
     )
     callouts = list(content.get("callouts") or [])
     for index, callout in enumerate(callouts):
@@ -2191,7 +2280,7 @@ def build_diagram_scene(
             dst = str(connector.get("to") or connector.get("target") or "")
             if src in positions and dst in positions and not connector.get("preserve_points"):
                 connector_obstacles = [
-                    inflated_rect(pos, 18)
+                    inflated_rect(pos, 12)
                     for block_id, pos in positions.items()
                     if block_id not in {src, dst}
                 ]
