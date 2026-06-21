@@ -7,7 +7,7 @@ description: "Convert Hello Interview excerpts, system design notes, API design 
 
 ## Goal
 
-Turn technical source material into a visual explanation a senior SDE candidate could use in an interview. The output should feel like an Excalidraw interview whiteboard: task/constraints at the top, native blocks in the middle, arrows for relationships, and sticky notes for gotchas or interviewer prompts. Do not turn the source into a long article card.
+Turn technical source material into a visual explanation a senior SDE candidate could use in an interview. The output should feel like a real Excalidraw system-design whiteboard: task/constraints at the top, native blocks in the middle, arrows for relationships, and sticky notes for gotchas, caveats, or production implications. Do not turn the source into a long article card.
 
 Default to English unless the user explicitly asks for Chinese or another language.
 
@@ -31,11 +31,52 @@ Start with one sentence summarizing what the excerpt is really about. Then build
 - senior caveat
 - production implication when it changes the design
 
-The board should explain the topic before the talk track is read. If included, the talk track should be short, usually 3-5 lines, and sound like a candidate making a judgment, not a textbook reciting definitions.
+The board should explain the topic before the talk track is read. The board itself should look like a strong candidate's live whiteboard, not coaching notes about how to answer. If included, the talk track should be short, usually 3-5 lines, and sound like a candidate making a judgment, not a textbook reciting definitions.
+
+## Board Content Vs Talk Track
+
+This skill is not a keyword summarizer. Treat the source paragraph as raw material for a senior-candidate answer, but separate what goes on the board from what the candidate says aloud.
+
+- **Board content**: professional design artifacts: resources, APIs, services, data flows, consistency boundaries, retry behavior, failure modes, and tradeoffs.
+- **Talk track**: candidate speech. This can use first person and interview phrasing.
+
+Do not put interview coaching phrases into the board JSON. Avoid `I would`, `my judgment`, `interview signal`, `candidate`, `面试可讲`, `我会`, `我的判断`, or `面试里` inside `task`, `constraints`, `blocks`, `connectors`, or `callouts`. Use those only in `talk_track` or in chat when the user asks for copyable speaking notes.
+
+Before creating the board JSON, infer and write from this internal structure:
+
+1. **Whiteboard objective.** The concrete design question being solved.
+2. **Professional board blocks.** Decisions, mechanisms, and boundaries that can stand on a live system-design whiteboard.
+3. **Judgment chain.** 2-4 blocks that each explain what design choice exists, why it matters, and what mechanism follows.
+4. **Senior caveat.** One failure mode, operational cost, retry/idempotency issue, consistency boundary, caching caveat, or product implication.
+5. **Speakable answer.** If requested outside the image, produce a 60-90 second answer in the requested language.
+
+The visual text should have **design sentence density**. Good board block:
+
+```text
+Cursor pagination for shifting data
+Offset pages can duplicate or skip records as new rows arrive.
+Return a cursor tied to the last stable record for high-volume or real-time feeds.
+```
+
+Weak block:
+
+```text
+Cursor
+Stable
+High volume
+```
+
+Default block formula:
+
+- `title`: a decision phrase, not a noun label.
+- `body`: 2-3 short whiteboard sentences that explain mechanism and tradeoff.
+- `callout`: one gotcha, product implication, or production caveat.
+
+If a block feels like flashcard keywords, rewrite it into professional whiteboard content before rendering. Put candidate phrasing in `talk_track`, not in the block.
 
 ## Voice
 
-Use a candidate-owned point of view without sounding like a diary.
+Use a candidate-owned point of view in `talk_track` or chat explanations without sounding like a diary.
 
 Good English phrases:
 
@@ -62,7 +103,7 @@ Pick the layout that matches the concept:
 - `comparison`: GraphQL vs REST, offset vs cursor, RPC vs REST, CP vs AP.
 - `pipeline`: request flow, retry flow, booking/payment/inventory flow, CDC, replication.
 - `architecture`: clients, gateways, services, databases, queues, caches, internal RPC.
-- `concept-map`: one concept with causes, examples, caveats, and interview signals.
+- `concept-map`: one concept with causes, examples, caveats, and production implications.
 - `auto`: only when none of the above clearly fits.
 
 Use manual `x`, `y`, `width`, and `height` when a custom layout would explain the idea better. Prefer fewer clean arrows over dense crossing arrows; use callouts for side notes.
@@ -89,16 +130,16 @@ Create a compact JSON object for the bundled renderer:
       "lane": "left",
       "kind": "component",
       "icon": "database",
-      "title": "Choose CP",
-      "body": "Block or fail requests to avoid stale reads."
+      "title": "CP for expensive wrong state",
+      "body": "Inventory, payment, and seat holds cannot confirm stale state. Use conditional writes, transactions, or strong reads; degrade instead of accepting double booking."
     },
     {
       "id": "ap",
       "lane": "right",
       "kind": "component",
       "icon": "cache",
-      "title": "Choose AP",
-      "body": "Keep serving and tolerate temporary staleness."
+      "title": "AP for freshness-as-UX",
+      "body": "Browsing, feeds, and recommendations can tolerate short-lived stale data. Serve from replicas or cache, then converge asynchronously."
     }
   ],
   "connectors": [
@@ -107,8 +148,8 @@ Create a compact JSON object for the bundled renderer:
   ],
   "callouts": [
     {
-      "title": "Interview signal",
-      "body": "Do not mechanically say pick any two. During a partition, pick C or A."
+      "title": "Partition-time choice",
+      "body": "Once a network partition exists, the practical tradeoff is stale reads versus failed requests."
     }
   ],
   "talk_track": "I would first ask which failure mode the product can tolerate: stale data or temporary unavailability."
@@ -125,8 +166,9 @@ Legacy fields `summary`, `script`, `short`, and `flows` still work, but prefer `
 - `kind: caveat`, `warning`, or `risk` renders as a yellow gotcha note.
 - `kind: client`, `actor`, or `user` can render as a circle/ellipse in architecture diagrams.
 - Add `icon: "api"`, `"database"`, `"cache"`, `"queue"`, `"storage"`, `"client"`, or `"service"` when it helps the block scan like a system-design whiteboard.
-- Keep each block to 1-3 short lines.
+- Keep each block to 2-4 short whiteboard lines; let dynamic height preserve the reasoning.
 - Make every block earn its place: no empty labels, no generic filler like "Core idea".
+- Do not reduce interview material to bare keywords. Every block should answer "what this design element does" or "what tradeoff it introduces".
 
 ## Rendering
 
@@ -149,7 +191,7 @@ Host-specific delivery:
 - Native Excalidraw block vocabulary: rounded rectangles, squares, circles/ellipses, dashed containers, arrows, and sticky notes.
 - Black/dark strokes and arrow lines by default.
 - Light-blue component fills (`#a5d8ff`) for main blocks.
-- Pale yellow/pink/mint fills for sticky notes and interviewer prompts.
+- Pale yellow/pink/mint fills for sticky notes, caveats, and production notes.
 - Dashed rounded frames for `Task:` and `Constraints:`.
 - Handwritten Excalidraw feel, including Chinese when requested.
 - Generous spacing and readable line breaks.

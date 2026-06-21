@@ -36,6 +36,8 @@ Default output is intentionally minimal:
 
 The generated board explains the material through native blocks, arrows, comparisons, system-design component diagrams, and sticky-note callouts. It should look like a clean interview whiteboard, not a long essay pasted into a box. The chat reply should not repeat the visual text unless the user explicitly asks for copyable text.
 
+The content step is intentionally LLM-heavy: the agent should first infer what a strong candidate would understand, then split output into two layers. The board contains professional whiteboard content: design choices, mechanisms, constraints, data flows, and tradeoffs. The `talk_track` contains the candidate-ready wording. Blocks should not be keyword flashcards, but they also should not sound like coaching notes.
+
 ## Recommended Architecture
 
 The best compatibility model is:
@@ -96,15 +98,30 @@ After the plugin or skill is installed in a host:
     "The choice affects storage, cache, replication, and fallback strategy"
   ],
   "blocks": [
-    {"id": "cp", "lane": "left", "kind": "component", "icon": "database", "title": "Choose CP", "body": "Reject stale reads."},
-    {"id": "ap", "lane": "right", "kind": "component", "icon": "cache", "title": "Choose AP", "body": "Stay online, accept staleness."}
+    {
+      "id": "cp",
+      "lane": "left",
+      "kind": "component",
+      "icon": "database",
+      "title": "CP for expensive wrong state",
+      "body": "Inventory, payment, and seat holds cannot confirm stale state. Use conditional writes, transactions, or strong reads; degrade instead of accepting double booking."
+    },
+    {
+      "id": "ap",
+      "lane": "right",
+      "kind": "component",
+      "icon": "cache",
+      "title": "AP for freshness-as-UX",
+      "body": "Browsing, feeds, and recommendations can tolerate short-lived stale data. Serve from replicas or cache, then converge asynchronously."
+    }
   ],
   "connectors": [
     {"from": "cp", "to": "ap", "label": "same partition, different product priority"}
   ],
   "callouts": [
-    {"title": "Interview signal", "body": "During a partition, the real choice is C or A."}
-  ]
+    {"title": "Partition-time choice", "body": "Once a network partition exists, the practical tradeoff is stale reads versus failed requests."}
+  ],
+  "talk_track": "I would first ask which failure mode the product can tolerate: stale data or temporary unavailability."
 }
 ```
 

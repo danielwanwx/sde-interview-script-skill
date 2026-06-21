@@ -7,7 +7,7 @@ description: "Turn pasted text, article excerpts, study notes, interview topics,
 
 ## Goal
 
-Create an Excalidraw whiteboard visual explanation, not a rewritten article. The board should feel like a hand-drawn interview whiteboard: task/constraints at the top, native Excalidraw blocks in the middle, arrows that show relationships, and sticky notes for gotchas or interviewer prompts.
+Create an Excalidraw whiteboard visual explanation, not a rewritten article. The board should feel like a hand-drawn technical whiteboard: task/constraints at the top, native Excalidraw blocks in the middle, arrows that show relationships, and sticky notes for gotchas, caveats, or production implications.
 
 Default to English unless the user specifies Chinese or another language.
 
@@ -29,10 +29,52 @@ Instead:
 - Make the visual structure the main explanation.
 - Use multiple small blocks, each with one solid idea.
 - Put reasoning on arrows when the transition matters.
-- Use callouts for gotchas, caveats, interviewer signals, and production implications.
+- Use callouts for gotchas, caveats, failure modes, and production implications.
 - Keep any talk track short, usually 3-5 lines. Prefer returning it in chat when the user wants copyable speaking notes.
 - Prefer concrete labels over generic labels like "Core idea" or "Tradeoff".
 - Do not use the old `summary + long script + four flow boxes` layout.
+
+## Board Content Vs Talk Track
+
+For interview or technical-learning material, do not summarize the paragraph mechanically. First infer what an excellent candidate would understand, then separate the output into two layers:
+
+1. **Board content**: what the candidate would actually draw on the whiteboard. This must be professional design content: entities, decisions, constraints, mechanisms, tradeoffs, and failure modes.
+2. **Talk track**: what the candidate would say while pointing at the board. This can use first person and interview phrasing.
+
+The board must not sound like interview coaching. Avoid phrases like `I would`, `my decision rule`, `interview signal`, `面试可讲`, `我会`, `我的判断`, or `面试里` inside `task`, `constraints`, `blocks`, `connectors`, or `callouts`. Put those in `talk_track` only.
+
+Before writing the JSON, mentally produce this content plan:
+
+1. **Whiteboard objective**: the concrete design question or concept being solved.
+2. **Board blocks**: professional labels and compact design statements.
+3. **Mechanisms**: what technique, storage choice, protocol, or data flow implements the decision.
+4. **Tradeoffs**: latency, consistency, retry behavior, operational cost, failure mode, or product implication.
+5. **Talk track**: 60-90 seconds when requested, written as direct candidate language.
+
+The visual blocks should contain **design sentence density**, not keyword density. A good board block sounds like this:
+
+```text
+CP for expensive wrong state
+Inventory, payment, and seat holds cannot confirm stale state.
+Use conditional writes, transactions, or strong reads; degrade instead of accepting double booking.
+```
+
+Avoid blocks like this:
+
+```text
+CP
+Strong consistency
+Transactions
+RDBMS
+```
+
+Use this block formula by default:
+
+- `title`: decision, mechanism, or design boundary in 3-8 words.
+- `body`: 2-3 compact design sentences. Include what it does and why it changes the architecture.
+- `callout`: gotcha, tradeoff, production caveat, or product implication.
+
+The board can still be concise, but it should look like a strong candidate's actual whiteboard, not notes about how to answer.
 
 ## Choose A Layout
 
@@ -68,16 +110,16 @@ Create a compact JSON object for the renderer:
       "lane": "left",
       "kind": "component",
       "icon": "database",
-      "title": "Choose CP",
-      "body": "Block/fail requests to avoid stale reads."
+      "title": "CP for expensive wrong state",
+      "body": "Inventory, payment, and seat holds cannot confirm stale state. Use conditional writes, transactions, or strong reads; degrade instead of accepting double booking."
     },
     {
       "id": "ap",
       "lane": "right",
       "kind": "component",
       "icon": "cache",
-      "title": "Choose AP",
-      "body": "Keep serving, tolerate temporary staleness."
+      "title": "AP for freshness-as-UX",
+      "body": "Browsing, feeds, and recommendations can tolerate short-lived stale data. Serve from replicas or cache, then converge asynchronously."
     }
   ],
   "connectors": [
@@ -85,8 +127,8 @@ Create a compact JSON object for the renderer:
   ],
   "callouts": [
     {
-      "title": "Interview signal",
-      "body": "Do not say pick any two. During a partition, pick C or A."
+      "title": "Partition-time choice",
+      "body": "Once a network partition exists, the practical tradeoff is stale reads versus failed requests."
     }
   ],
   "talk_track": "I would first ask what failure is cheaper for the product: stale data or temporary unavailability."
@@ -103,8 +145,9 @@ Legacy fields `summary`, `script`, `short`, and `flows` still work, but prefer `
 - `kind: caveat`, `warning`, or `risk` renders as a yellow gotcha note.
 - `kind: client`, `actor`, or `user` can render as a circle/ellipse in architecture diagrams.
 - Add `icon: "api"`, `"database"`, `"cache"`, `"queue"`, `"storage"`, `"client"`, or `"service"` when it helps the block scan like a system-design whiteboard.
-- Keep each block to 1-3 short lines.
+- Keep each block to 2-4 short whiteboard lines; use dynamic height rather than deleting the reasoning.
 - Make every block earn its place: no empty labels, no generic filler.
+- Do not reduce interview material to bare keywords. Every block should answer "what this design element does" or "what tradeoff it introduces".
 
 ## Language Rules
 
@@ -134,7 +177,7 @@ Host-specific delivery:
 - Native Excalidraw block vocabulary: rounded rectangles, squares, circles/ellipses, dashed containers, arrows, and sticky notes.
 - Black/dark strokes and arrow lines by default.
 - Light-blue component fills (`#a5d8ff`) for main blocks.
-- Pale yellow/pink/mint fills for sticky notes and interviewer prompts.
+- Pale yellow/pink/mint fills for sticky notes, caveats, and production notes.
 - Dashed rounded frames for `Task:` and `Constraints:`.
 - Handwritten Excalidraw feel, including Chinese when requested.
 - Generous spacing and readable line breaks.
