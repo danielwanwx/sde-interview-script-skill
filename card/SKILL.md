@@ -32,6 +32,8 @@ Instead:
 - Use callouts for gotchas, caveats, failure modes, and production implications.
 - Keep any talk track short, usually 3-5 lines. Prefer returning it in chat when the user wants copyable speaking notes.
 - Prefer concrete labels over generic labels like "Core idea" or "Tradeoff".
+- Avoid decorative component icons by default; they often steal width from the sentence and can destabilize layout.
+- Prefer one sentence per line when it fits. Do not manually break one sentence into many short fragments.
 - Do not use the old `summary + long script + four flow boxes` layout.
 
 ## Board Content Vs Talk Track
@@ -109,7 +111,6 @@ Create a compact JSON object for the renderer:
       "id": "cp",
       "lane": "left",
       "kind": "component",
-      "icon": "database",
       "title": "CP for expensive wrong state",
       "body": "Inventory, payment, and seat holds cannot confirm stale state. Use conditional writes, transactions, or strong reads; degrade instead of accepting double booking."
     },
@@ -117,7 +118,6 @@ Create a compact JSON object for the renderer:
       "id": "ap",
       "lane": "right",
       "kind": "component",
-      "icon": "cache",
       "title": "AP for freshness-as-UX",
       "body": "Browsing, feeds, and recommendations can tolerate short-lived stale data. Serve from replicas or cache, then converge asynchronously."
     }
@@ -144,8 +144,9 @@ Legacy fields `summary`, `script`, `short`, and `flows` still work, but prefer `
 - `kind: note`, `callout`, or `question` renders as a sticky-note block.
 - `kind: caveat`, `warning`, or `risk` renders as a yellow gotcha note.
 - `kind: client`, `actor`, or `user` can render as a circle/ellipse in architecture diagrams.
-- Add `icon: "api"`, `"database"`, `"cache"`, `"queue"`, `"storage"`, `"client"`, or `"service"` when it helps the block scan like a system-design whiteboard.
+- Do not add `icon` by default. If a specific icon is truly needed, set both `icon` and `show_icon: true`; otherwise let the block shape and title carry the meaning.
 - Keep each block to 2-4 short whiteboard lines; use dynamic height rather than deleting the reasoning.
+- Keep each sentence intact on one line when width allows. Let wrapping happen only as a fallback for genuinely long sentences.
 - Make every block earn its place: no empty labels, no generic filler.
 - Do not reduce interview material to bare keywords. Every block should answer "what this design element does" or "what tradeoff it introduces".
 
@@ -180,7 +181,9 @@ Host-specific delivery:
 - Pale yellow/pink/mint fills for sticky notes, caveats, and production notes.
 - Dashed rounded frames for `Task:` and `Constraints:`.
 - Handwritten Excalidraw feel, including Chinese when requested.
-- Generous spacing and readable line breaks.
+- Rows should use the available width and align cleanly at the left/right edges when possible.
+- Left-align block body text by default; center only titles or tiny actor/client nodes when it improves scanning.
+- Readable line breaks: prefer sentence-level lines over phrase fragments.
 
 ## Quality Bar
 

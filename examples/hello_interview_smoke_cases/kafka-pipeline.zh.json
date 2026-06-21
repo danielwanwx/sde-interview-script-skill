@@ -14,14 +14,12 @@
     {
       "id": "producer",
       "kind": "component",
-      "icon": "service",
       "title": "Producer 先选顺序维度",
       "body": "事件的有序维度决定 partition key。这个 key 决定消息进入哪个 partition，也决定后续并行度和热点风险。"
     },
     {
       "id": "topic",
       "kind": "queue",
-      "icon": "queue",
       "title": "Topic 表达业务事件流",
       "body": "Topic 表达业务事件流，不只是队列名。Topic 边界按消费语义拆分，避免一个 topic 混入太多不相关事件。"
     },
@@ -34,14 +32,12 @@
     {
       "id": "consumer",
       "kind": "service",
-      "icon": "service",
       "title": "Consumer group 决定并行度",
       "body": "同一个 consumer group 里，一个 partition 同时只给一个 consumer 处理。扩容消费者之前，要确认 partition 数量和处理耗时。"
     },
     {
       "id": "sink",
       "kind": "database",
-      "icon": "database",
       "title": "副作用成功后再提交 offset",
       "body": "默认按至少一次语义设计。数据库写入或外部副作用成功后再提交 offset，因此消费者逻辑必须幂等。"
     }

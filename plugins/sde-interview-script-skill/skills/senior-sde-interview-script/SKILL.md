@@ -108,6 +108,8 @@ Pick the layout that matches the concept:
 
 Use manual `x`, `y`, `width`, and `height` when a custom layout would explain the idea better. Prefer fewer clean arrows over dense crossing arrows; use callouts for side notes.
 
+Avoid decorative component icons by default. They are optional, and in dense interview boards they often reduce text width or cause layout drift. Prefer clean native blocks with strong labels and sentence-level content.
+
 ## Content Shape
 
 Create a compact JSON object for the bundled renderer:
@@ -129,7 +131,6 @@ Create a compact JSON object for the bundled renderer:
       "id": "cp",
       "lane": "left",
       "kind": "component",
-      "icon": "database",
       "title": "CP for expensive wrong state",
       "body": "Inventory, payment, and seat holds cannot confirm stale state. Use conditional writes, transactions, or strong reads; degrade instead of accepting double booking."
     },
@@ -137,7 +138,6 @@ Create a compact JSON object for the bundled renderer:
       "id": "ap",
       "lane": "right",
       "kind": "component",
-      "icon": "cache",
       "title": "AP for freshness-as-UX",
       "body": "Browsing, feeds, and recommendations can tolerate short-lived stale data. Serve from replicas or cache, then converge asynchronously."
     }
@@ -165,8 +165,9 @@ Legacy fields `summary`, `script`, `short`, and `flows` still work, but prefer `
 - `kind: note`, `callout`, or `question` renders as a sticky-note block.
 - `kind: caveat`, `warning`, or `risk` renders as a yellow gotcha note.
 - `kind: client`, `actor`, or `user` can render as a circle/ellipse in architecture diagrams.
-- Add `icon: "api"`, `"database"`, `"cache"`, `"queue"`, `"storage"`, `"client"`, or `"service"` when it helps the block scan like a system-design whiteboard.
+- Do not add `icon` by default. If a specific icon is truly needed, set both `icon` and `show_icon: true`; otherwise keep the layout text-first.
 - Keep each block to 2-4 short whiteboard lines; let dynamic height preserve the reasoning.
+- Prefer one sentence per line when it fits. Do not manually split one sentence into many short phrase lines.
 - Make every block earn its place: no empty labels, no generic filler like "Core idea".
 - Do not reduce interview material to bare keywords. Every block should answer "what this design element does" or "what tradeoff it introduces".
 
@@ -194,7 +195,9 @@ Host-specific delivery:
 - Pale yellow/pink/mint fills for sticky notes, caveats, and production notes.
 - Dashed rounded frames for `Task:` and `Constraints:`.
 - Handwritten Excalidraw feel, including Chinese when requested.
-- Generous spacing and readable line breaks.
+- Rows should use the available width and align cleanly at the left/right edges when possible.
+- Left-align block body text by default; center only titles or tiny actor/client nodes when it improves scanning.
+- Readable line breaks: prefer sentence-level lines over phrase fragments.
 
 ## Quality Bar
 

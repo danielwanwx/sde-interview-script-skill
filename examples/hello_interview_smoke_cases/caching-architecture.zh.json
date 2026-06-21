@@ -16,7 +16,6 @@
       "lane": "top",
       "kind": "client",
       "shape": "circle",
-      "icon": "client",
       "title": "Client sees latency first",
       "body": "用户感受到的是页面慢或失败。缓存设计要先保护读路径体验，而不是盲目把所有数据都塞进缓存。"
     },
@@ -24,7 +23,6 @@
       "id": "cdn",
       "lane": "top",
       "kind": "component",
-      "icon": "cdn",
       "title": "CDN for shared edge reads",
       "body": "静态资源、图片和公开响应优先放 CDN。它离用户近，能先挡住大量不需要进应用层的流量。"
     },
@@ -32,7 +30,6 @@
       "id": "app",
       "lane": "middle",
       "kind": "service",
-      "icon": "service",
       "title": "Application owns cache policy",
       "body": "Cache-aside 读路径先查缓存，miss 再查 DB 并回填。写路径需要明确删除缓存或更新缓存，避免长期脏读。"
     },
@@ -40,7 +37,6 @@
       "id": "redis",
       "lane": "middle",
       "kind": "cache",
-      "icon": "cache",
       "title": "Shared cache for expensive reads",
       "body": "Redis 适合高频、昂贵、变化不太频繁的数据。TTL、eviction 和 key 设计会决定一致性和成本。"
     },
@@ -55,7 +51,6 @@
       "id": "db",
       "lane": "bottom",
       "kind": "database",
-      "icon": "database",
       "title": "DB remains source of truth",
       "body": "缓存不是新的事实来源。缓存故障时要能回源，但也要防止所有 miss 同时打爆数据库。"
     }

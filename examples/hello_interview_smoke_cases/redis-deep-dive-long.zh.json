@@ -20,7 +20,6 @@
     {
       "id": "cache",
       "kind": "cache",
-      "icon": "cache",
       "title": "Cache when data can be rebuilt",
       "body": "缓存适合 profile、feed、API response 这类可回源数据。重点是 TTL、失效策略，以及缓存挂了是否能降级。"
     },

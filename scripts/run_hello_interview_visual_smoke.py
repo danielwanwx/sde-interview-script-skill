@@ -151,6 +151,12 @@ def validate_scene(
     for element in scene.get("elements", []):
         element_type = str(element.get("type"))
         counts[element_type] = counts.get(element_type, 0) + 1
+        if element_type == "image":
+            key = str((element.get("customData") or {}).get("key") or element.get("fileId") or "")
+            if key.startswith(("icon", "wb_icon")):
+                raise AssertionError(
+                    f"{case_path.name}: component icons should not render by default: {key}",
+                )
         bounds = element_bounds(element)
         if not bounds:
             continue

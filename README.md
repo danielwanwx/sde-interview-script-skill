@@ -1,6 +1,6 @@
 # SDE Interview Script Skill
 
-A cross-agent plugin/skill package for turning pasted text into Excalidraw-style whiteboard visuals. It uses native Excalidraw blocks: dashed task/constraints frames, light-blue component blocks, black arrows, circles/squares/rectangles, and sticky notes for gotchas. It includes a short `$card` entrypoint for general text and a backward-compatible `$senior-sde-interview-script` entrypoint for SDE interview prep. Output language defaults to English, and users can request Chinese or another language in the prompt.
+A cross-agent plugin/skill package for turning pasted text into Excalidraw-style whiteboard visuals. It uses native Excalidraw blocks: dashed task/constraints frames, light-blue component blocks, black arrows, circles/squares/rectangles, and sticky notes for gotchas. It avoids decorative component icons by default so layout stays clean and predictable. It includes a short `$card` entrypoint for general text and a backward-compatible `$senior-sde-interview-script` entrypoint for SDE interview prep. Output language defaults to English, and users can request Chinese or another language in the prompt.
 
 ## Simplest Usage
 
@@ -34,7 +34,7 @@ Default output is intentionally minimal:
 - an editable Excalidraw link when upload succeeds
 - a local `.excalidraw` path as fallback
 
-The generated board explains the material through native blocks, arrows, comparisons, system-design component diagrams, and sticky-note callouts. It should look like a clean interview whiteboard, not a long essay pasted into a box. The chat reply should not repeat the visual text unless the user explicitly asks for copyable text.
+The generated board explains the material through native blocks, arrows, comparisons, system-design component diagrams, and sticky-note callouts. It should look like a clean interview whiteboard, not a long essay pasted into a box. Text should prefer one sentence per line when it fits, with left-aligned block content and rows that use the available width. The chat reply should not repeat the visual text unless the user explicitly asks for copyable text.
 
 The content step is intentionally LLM-heavy: the agent should first infer what a strong candidate would understand, then split output into two layers. The board contains professional whiteboard content: design choices, mechanisms, constraints, data flows, and tradeoffs. The `talk_track` contains the candidate-ready wording. Blocks should not be keyword flashcards, but they also should not sound like coaching notes.
 
@@ -102,7 +102,6 @@ After the plugin or skill is installed in a host:
       "id": "cp",
       "lane": "left",
       "kind": "component",
-      "icon": "database",
       "title": "CP for expensive wrong state",
       "body": "Inventory, payment, and seat holds cannot confirm stale state. Use conditional writes, transactions, or strong reads; degrade instead of accepting double booking."
     },
@@ -110,7 +109,6 @@ After the plugin or skill is installed in a host:
       "id": "ap",
       "lane": "right",
       "kind": "component",
-      "icon": "cache",
       "title": "AP for freshness-as-UX",
       "body": "Browsing, feeds, and recommendations can tolerate short-lived stale data. Serve from replicas or cache, then converge asynchronously."
     }

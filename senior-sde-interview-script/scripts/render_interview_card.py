@@ -164,12 +164,23 @@ def wrap_paragraph(paragraph: str, size: int, max_width: int) -> list[str]:
     return fixed
 
 
+def split_sentence_units(paragraph: str) -> list[str]:
+    text = paragraph.strip()
+    if not text:
+        return []
+    if text.startswith(("-", "•", "*")):
+        return [text]
+    parts = re.split(r"(?<=[。！？；!?;])\s*|(?<=[.!?;])\s+(?=[A-Z0-9\"'`])", text)
+    return [part.strip() for part in parts if part.strip()]
+
+
 def wrap_text(text: str, size: int, max_width: int) -> list[str | None]:
     wrapped: list[str | None] = []
     paragraphs = text.split("\n")
     for idx, paragraph in enumerate(paragraphs):
         if paragraph:
-            wrapped.extend(wrap_paragraph(paragraph, size, max_width))
+            for sentence in split_sentence_units(paragraph):
+                wrapped.extend(wrap_paragraph(sentence, size, max_width))
         else:
             wrapped.append(None)
         if idx != len(paragraphs) - 1:
@@ -401,6 +412,7 @@ def image_element(
             "scale": [1, 1],
             "status": "saved",
             "crop": None,
+            "customData": {"key": key},
         },
     )
     return element, file_id
@@ -630,6 +642,14 @@ def plus_block_stroke(block: dict[str, Any]) -> str:
 
 def plus_text_color(block: dict[str, Any]) -> str:
     return str(block.get("textColor") or block.get("text_color") or PLUS_STROKE)
+
+
+def plus_icon_name(block: dict[str, Any]) -> str:
+    show_icon = any(
+        bool(block.get(key))
+        for key in ("show_icon", "showIcon", "render_icon", "renderIcon")
+    )
+    return str(block.get("icon") or "").strip() if show_icon else ""
 
 
 def coerce_text(value: Any) -> str:
@@ -963,9 +983,9 @@ def add_whiteboard_text(
 
 
 def whiteboard_block_min_height(block: dict[str, Any], width: float, default_height: float) -> float:
-    icon_name = str(block.get("icon") or "").strip()
+    icon_name = plus_icon_name(block)
     icon_space = 92 if icon_name and width > 260 else 0
-    text_width = int(max(130, width - 48 - icon_space))
+    text_width = int(max(130, width - 40 - icon_space))
     text_block = rich_text_block_svg(
         str(block.get("title") or ""),
         str(block.get("body") or ""),
@@ -973,7 +993,7 @@ def whiteboard_block_min_height(block: dict[str, Any], width: float, default_hei
         plus_text_color(block),
         int(block.get("title_size") or 28),
         int(block.get("body_size") or 20),
-        align=str(block.get("align") or "center").lower(),
+        align=str(block.get("align") or "left").lower(),
         font_family=DIAGRAM_FONT,
     )
     explicit_height = dimension(block.get("height") or block.get("h"), default_height, 900)
@@ -1026,10 +1046,10 @@ def add_whiteboard_block(
             ),
         )
 
-    icon_name = str(block.get("icon") or "").strip()
+    icon_name = plus_icon_name(block)
     icon_space = 92 if icon_name and w > 260 else 0
-    text_x = x + 24 + icon_space
-    text_w = int(max(130, w - 48 - icon_space))
+    text_x = x + 22 + icon_space
+    text_w = int(max(130, w - 44 - icon_space))
     text_block = rich_text_block_svg(
         str(block.get("title") or ""),
         str(block.get("body") or ""),
@@ -1037,15 +1057,16 @@ def add_whiteboard_block(
         plus_text_color(block),
         int(block.get("title_size") or 28),
         int(block.get("body_size") or 20),
-        align=str(block.get("align") or "center").lower(),
+        align=str(block.get("align") or "left").lower(),
         font_family=DIAGRAM_FONT,
     )
     key = f"wb_block_{block['id']}"
     blocks_svg[key] = text_block
     text_y = y + max(18, (h - text_block["height"]) / 2)
+    align = str(block.get("align") or "left").lower()
     if icon_space:
         text_x = x + icon_space + (w - icon_space - text_block["width"]) / 2
-    else:
+    elif align == "center":
         text_x = x + (w - text_block["width"]) / 2
     add_image_block(elements, files, rng, key, text_block, text_x, text_y, now)
 
@@ -1110,21 +1131,28 @@ def whiteboard_positions(
         return positions
 
     if layout in {"pipeline", "flow", "sequence"}:
-        block_w = 380 if len(blocks) > 3 else 430
+        desired_w = 410 if len(blocks) > 3 else 460
         block_h = 155
         gap = 54
-        max_cols = max(1, min(len(blocks), int((content_width + gap) // (block_w + gap))))
+        max_cols = max(1, min(len(blocks), int((content_width + gap) // (desired_w + gap))))
         y_cursor = top
         for row_start in range(0, len(blocks), max_cols):
             row_blocks = blocks[row_start : row_start + max_cols]
             row_count = len(row_blocks)
-            total = row_count * block_w + max(0, row_count - 1) * gap
+            row_w = (
+                (content_width - max(0, row_count - 1) * gap) / row_count
+                if row_count > 1
+                else min(620, content_width)
+            )
+            total = row_count * row_w + max(0, row_count - 1) * gap
             start_x = margin + max(0, (content_width - total) / 2)
-            widths = [dimension(block.get("width") or block.get("w"), block_w, canvas_width) for block in row_blocks]
+            widths = [dimension(block.get("width") or block.get("w"), row_w, canvas_width) for block in row_blocks]
             heights = [whiteboard_block_min_height(block, widths[index], block_h) for index, block in enumerate(row_blocks)]
             row_height = max(heights, default=block_h)
+            x_cursor = start_x
             for index, block in enumerate(row_blocks):
-                positions[str(block["id"])] = (start_x + index * (block_w + gap), y_cursor, widths[index], heights[index])
+                positions[str(block["id"])] = (x_cursor, y_cursor, widths[index], heights[index])
+                x_cursor += widths[index] + gap
             y_cursor += row_height + 88
         return positions
 
@@ -1145,22 +1173,43 @@ def whiteboard_positions(
         for row, row_blocks in rows.items():
             if not row_blocks:
                 continue
-            block_w = 300 if len(row_blocks) >= 4 else 360
             gap = 70
-            total = len(row_blocks) * block_w + max(0, len(row_blocks) - 1) * gap
-            x0 = max(margin, (canvas_width - total) / 2)
+            row_widths: list[float] = []
+            flexible_indexes: list[int] = []
+            fixed_total = 0.0
+            for index, block in enumerate(row_blocks):
+                shape = str(block.get("shape") or "").lower()
+                kind = block_kind(block)
+                explicit_width = block.get("width") or block.get("w")
+                if explicit_width is not None:
+                    width = dimension(explicit_width, 320, canvas_width)
+                    row_widths.append(width)
+                    fixed_total += width
+                elif shape in {"circle", "ellipse"} or kind in {"client", "actor", "user"}:
+                    width = 250 if len(row_blocks) > 1 else 220
+                    row_widths.append(width)
+                    fixed_total += width
+                else:
+                    row_widths.append(0)
+                    flexible_indexes.append(index)
+            remaining = content_width - max(0, len(row_blocks) - 1) * gap - fixed_total
+            flex_w = max(300, remaining / max(1, len(flexible_indexes))) if flexible_indexes else 0
+            for index in flexible_indexes:
+                row_widths[index] = flex_w
+            total = sum(row_widths) + max(0, len(row_blocks) - 1) * gap
+            x0 = margin if len(row_blocks) > 1 else (canvas_width - total) / 2
             row_items: list[tuple[dict[str, Any], float, float, float]] = []
+            x_cursor = x0
             for index, block in enumerate(row_blocks):
                 shape = str(block.get("shape") or "").lower()
                 kind = block_kind(block)
                 default_h = 170
-                w = block_w
+                w = row_widths[index]
                 if shape in {"circle", "ellipse"} or kind in {"client", "actor", "user"}:
-                    w = 180
-                    default_h = 180
-                w = dimension(block.get("width") or block.get("w"), w, canvas_width)
+                    default_h = 210 if len(row_blocks) > 1 else 180
                 h = whiteboard_block_min_height(block, w, default_h)
-                row_items.append((block, x0 + index * (block_w + gap), w, h))
+                row_items.append((block, x_cursor, w, h))
+                x_cursor += w + gap
             row_height = max((item[3] for item in row_items), default=170)
             for block, x, w, h in row_items:
                 positions[str(block["id"])] = (x, y_cursor + (row_height - h) / 2, w, h)
@@ -1339,7 +1388,7 @@ def build_whiteboard_scene(content: dict[str, Any], slug: str) -> tuple[dict[str
         src = str(connector.get("from") or connector.get("source") or "")
         dst = str(connector.get("to") or connector.get("target") or "")
         if connector.get("points"):
-            points = [[float(p[0]), float(p[1])] for p in connector["points"] if isinstance(p, list | tuple) and len(p) >= 2]
+            points = [[float(p[0]), float(p[1])] for p in connector["points"] if isinstance(p, (list, tuple)) and len(p) >= 2]
         elif src in positions and dst in positions:
             if str(connector.get("routing") or "").lower() in {"centered", "center", "decision"}:
                 points = centered_right_angle_points(positions[src], positions[dst])
@@ -1541,13 +1590,13 @@ def build_diagram_scene(
         fill = plus_block_fill(block) if plus_style else str(block.get("fill") or block.get("background") or "transparent")
         text_color = plus_text_color(block) if plus_style else (stroke if stroke != "#111827" else "#111827")
         shape = block_shape(block, allow_diamond=(not plus_style or bool(block.get("allowDiamond"))))
-        default_align = "center" if plus_style else "left"
+        default_align = "left"
         default_valign = "center" if plus_style else "top"
         align = str(block.get("align") or content.get("align") or default_align).lower()
         valign = str(block.get("valign") or content.get("valign") or default_valign).lower()
         stroke_width = int(block.get("strokeWidth") or block.get("stroke_width") or (2 if plus_style else (3 if stroke == "#2563eb" else 2)))
         stroke_style = str(block.get("strokeStyle") or block.get("stroke_style") or "solid")
-        icon_name = str(block.get("icon") or "").strip()
+        icon_name = plus_icon_name(block) if plus_style else ""
         reserve_icon_space = bool(plus_style and icon_name)
         text_area_x = x
         text_area_w = w
@@ -1633,7 +1682,7 @@ def build_diagram_scene(
             points = [
                 [float(point[0]), float(point[1])]
                 for point in raw_points
-                if isinstance(point, list | tuple) and len(point) >= 2
+                if isinstance(point, (list, tuple)) and len(point) >= 2
             ]
             if len(points) < 2:
                 continue
@@ -1718,10 +1767,10 @@ def build_diagram_scene(
             PLUS_STROKE if plus_style else stroke,
             24 if plus_style else 22,
             21 if plus_style else 20,
-            align=str(callout.get("align") or ("center" if plus_style else "left")).lower(),
+            align=str(callout.get("align") or "left").lower(),
             font_family=DIAGRAM_FONT if plus_style else HANDWRITING_FONT,
         )
-        text_x = x + (w - blocks_svg[key]["width"]) / 2 if plus_style else x + 24
+        text_x = x + 24
         text_y = y + max(16, (h - blocks_svg[key]["height"]) / 2) if plus_style else y + 26
         add_image_block(elements, files, rng, key, blocks_svg[key], text_x, text_y, now)
         max_y = max(max_y, y + h)
