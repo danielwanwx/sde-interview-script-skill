@@ -53,6 +53,13 @@ Before writing the JSON, mentally produce this content plan:
 4. **Tradeoffs**: latency, consistency, retry behavior, operational cost, failure mode, or product implication.
 5. **Talk track**: 60-90 seconds when requested, written as direct candidate language.
 
+Also do a compact pre-drawing planning pass before choosing the final layout:
+
+- Use `single`, `comparison`, `pipeline`, `architecture`, or `concept-map` when the source is one clear idea.
+- Use `modular-composite` when the source has more than five meaningful entities, more than two flows, multiple technical types, or mixes architecture, consistency, scaling, and failure recovery.
+- Split complex systems into modules such as overview, read path, write path, consistency boundary, async processing, failure recovery, or operational tradeoffs.
+- Keep the board content professional, as if drawn by the candidate during the interview. Do not put coaching instructions in module names or blocks.
+
 The visual blocks should contain **design sentence density**, not keyword density. A good board block sounds like this:
 
 ```text
@@ -86,6 +93,7 @@ Pick the layout that fits the source:
 - `architecture`: for services, data stores, caches, clients, system boundaries, and API/RPC flows.
 - `pipeline`: for request flows, async processing, replication, CDC, queues.
 - `concept-map`: for explaining one concept through surrounding causes, examples, caveats, and implications.
+- `modular-composite`: for larger system-design material that needs multiple coordinated mini-diagrams instead of one crowded workflow.
 - `auto`: only when none of the above clearly fits.
 
 Use manual `x`, `y`, `width`, and `height` when a custom layout would explain the idea better. Coordinates are pixels on a roughly `1760px` wide canvas. Prefer fewer clean arrows over dense crossing arrows; use callouts for side notes.
@@ -112,6 +120,11 @@ Create a compact JSON object for the renderer:
   "language": "English",
   "style": "excalidraw-plus",
   "layout": "comparison",
+  "planning": {
+    "complexity": "medium",
+    "diagram_strategy": "comparison",
+    "reason": "The source is a CP versus AP tradeoff."
+  },
   "summary": "CAP is a partition-time product decision: stale data or failed requests.",
   "task": "Ask which failure hurts more during a partition: stale data or failed requests.",
   "constraints": [
@@ -148,6 +161,24 @@ Create a compact JSON object for the renderer:
 ```
 
 Legacy fields `summary`, `script`, `short`, and `flows` still work, but prefer `style: "excalidraw-plus"`, `task`, `constraints`, `blocks`, `connectors`, and `callouts`.
+
+For `modular-composite`, include `planning.modules` or top-level `modules`, then assign each block to a module:
+
+```json
+{
+  "layout": "modular-composite",
+  "modules": [
+    {"id": "overview", "title": "System overview", "layout": "overview", "full_width": true},
+    {"id": "booking", "title": "Booking/write path", "layout": "pipeline"},
+    {"id": "inventory", "title": "Consistency boundary", "layout": "concept"}
+  ],
+  "blocks": [
+    {"id": "gateway", "module": "overview", "kind": "api", "title": "Edge protects the sale", "body": "Authenticate, rate-limit, and attach idempotency before requests reach booking."},
+    {"id": "hold", "module": "booking", "kind": "service", "title": "Create an expiring seat hold", "body": "Reserve the seat for a short TTL before charging. Expiry releases inventory without manual cleanup."},
+    {"id": "inventory", "module": "inventory", "kind": "database", "title": "Inventory is the CP boundary", "body": "Use conditional writes or transactions so one seat cannot have two active holds."}
+  ]
+}
+```
 
 ## Block Guidance
 

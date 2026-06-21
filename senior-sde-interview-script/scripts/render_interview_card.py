@@ -51,6 +51,15 @@ PLUS_YELLOW = "#fffbe6"
 PLUS_GREEN = "#f1fcf3"
 PLUS_MINT = "#eef8ff"
 
+MODULAR_LAYOUTS = {
+    "modular",
+    "composite",
+    "modular-composite",
+    "modular_composite",
+    "multi-module",
+    "multi_module",
+}
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -1179,6 +1188,43 @@ def add_top_frame(
     add_image_block(elements, files, rng, f"{key}_body", body_block, x + 28, body_y, now)
 
 
+def add_module_frame(
+    elements: list[dict[str, Any]],
+    files: dict[str, Any],
+    blocks_svg: dict[str, Any],
+    rng: random.Random,
+    frame: dict[str, Any],
+    now: int,
+) -> None:
+    x = float(frame["x"])
+    y = float(frame["y"])
+    w = float(frame["w"])
+    h = float(frame["h"])
+    frame_element = rectangle(
+        rng,
+        x,
+        y,
+        w,
+        h,
+        PLUS_STROKE,
+        2,
+        now,
+        background="transparent",
+        stroke_style="dashed",
+    )
+    frame_element["customData"] = {
+        "role": "module_frame",
+        "moduleId": str(frame.get("id") or ""),
+    }
+    elements.append(frame_element)
+
+    title = str(frame.get("title") or frame.get("id") or "Module")
+    title_block = text_block_svg(title, 25, int(w - 48), PLUS_STROKE, 5, 9, DIAGRAM_FONT, align="left")
+    key = f"wb_module_{frame.get('id')}_title"
+    blocks_svg[key] = title_block
+    add_image_block(elements, files, rng, key, title_block, x + 24, y + 18, now)
+
+
 def add_whiteboard_text(
     elements: list[dict[str, Any]],
     files: dict[str, Any],
@@ -1204,6 +1250,9 @@ def whiteboard_block_min_height(block: dict[str, Any], width: float, default_hei
     icon_name = plus_icon_name(block)
     icon_space = 92 if icon_name and width > 260 else 0
     text_width = int(max(130, width - 40 - icon_space))
+    shape = str(block.get("shape") or "").lower()
+    kind = block_kind(block)
+    default_align = "center" if shape in {"circle", "ellipse", "oval"} or kind in {"client", "actor", "user"} else "left"
     text_block = rich_text_block_svg(
         str(block.get("title") or ""),
         str(block.get("body") or ""),
@@ -1211,11 +1260,190 @@ def whiteboard_block_min_height(block: dict[str, Any], width: float, default_hei
         plus_text_color(block),
         int(block.get("title_size") or 28),
         int(block.get("body_size") or 20),
-        align=str(block.get("align") or "left").lower(),
+        align=str(block.get("align") or default_align).lower(),
         font_family=DIAGRAM_FONT,
     )
     explicit_height = dimension(block.get("height") or block.get("h"), default_height, 900)
     return max(explicit_height, text_block["height"] + 48)
+
+
+def normalize_module_key(value: Any) -> str:
+    text = str(value or "main").strip().lower()
+    if not text:
+        return "main"
+    text = re.sub(r"[^\w\u3400-\u9fff-]+", "-", text)
+    text = re.sub(r"-+", "-", text).strip("-")
+    return text or "main"
+
+
+def block_module_key(block: dict[str, Any]) -> str:
+    return normalize_module_key(
+        block.get("module")
+        or block.get("section")
+        or block.get("group")
+        or block.get("cluster")
+        or "main",
+    )
+
+
+def module_specs(content: dict[str, Any], blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    planning = content.get("planning") if isinstance(content.get("planning"), dict) else {}
+    raw_modules = content.get("modules") or planning.get("modules") or []
+    specs: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for index, raw in enumerate(raw_modules):
+        if isinstance(raw, str):
+            spec = {"id": raw, "title": raw}
+        elif isinstance(raw, dict):
+            spec = dict(raw)
+        else:
+            continue
+        module_id = normalize_module_key(spec.get("id") or spec.get("key") or spec.get("title") or f"module-{index + 1}")
+        if module_id in seen:
+            continue
+        spec["id"] = module_id
+        spec.setdefault("title", str(raw) if isinstance(raw, str) else module_id.replace("-", " ").title())
+        specs.append(spec)
+        seen.add(module_id)
+
+    for block in blocks:
+        module_id = block_module_key(block)
+        if module_id in seen:
+            continue
+        specs.append({"id": module_id, "title": module_id.replace("-", " ").title()})
+        seen.add(module_id)
+    return specs
+
+
+def is_full_width_module(spec: dict[str, Any], index: int, total: int) -> bool:
+    if bool(spec.get("full_width") or spec.get("fullWidth")):
+        return True
+    text = f"{spec.get('id', '')} {spec.get('title', '')} {spec.get('layout', '')}".lower()
+    if any(token in text for token in ("overview", "context", "topology", "系统概览", "全局", "总览")):
+        return True
+    return index == 0 and total > 4 and str(spec.get("layout") or "").lower() in {"architecture", "overview"}
+
+
+def module_column_count(spec: dict[str, Any], frame_w: float, block_count: int) -> int:
+    requested = spec.get("columns") or spec.get("cols")
+    if requested is not None:
+        return max(1, min(4, int(dimension(requested, 1, 4))))
+    layout = str(spec.get("layout") or "").lower()
+    if frame_w >= 1120 and block_count >= 3:
+        return 3
+    if frame_w >= 930 and block_count >= 2 and layout in {"pipeline", "flow", "architecture", "overview"}:
+        return 2
+    return 1
+
+
+def layout_module_content(
+    module_blocks: list[dict[str, Any]],
+    spec: dict[str, Any],
+    frame_x: float,
+    frame_y: float,
+    frame_w: float,
+) -> tuple[dict[str, tuple[float, float, float, float]], float]:
+    positions: dict[str, tuple[float, float, float, float]] = {}
+    padding_x = 26
+    padding_bottom = 28
+    title_area = 66
+    block_gap_x = 34
+    block_gap_y = 30
+    cols = module_column_count(spec, frame_w, len(module_blocks))
+    inner_w = frame_w - padding_x * 2
+    block_w = (inner_w - block_gap_x * (cols - 1)) / cols
+    y_cursor = frame_y + title_area
+
+    for row_start in range(0, len(module_blocks), cols):
+        row_blocks = module_blocks[row_start : row_start + cols]
+        heights = [
+            whiteboard_block_min_height(
+                block,
+                block_w,
+                150 if frame_w < 900 else 160,
+            )
+            for block in row_blocks
+        ]
+        row_height = max(heights, default=150)
+        row_count = len(row_blocks)
+        row_w = row_count * block_w + max(0, row_count - 1) * block_gap_x
+        x0 = frame_x + padding_x + max(0, (inner_w - row_w) / 2)
+        for index, block in enumerate(row_blocks):
+            x = x0 + index * (block_w + block_gap_x)
+            h = heights[index]
+            positions[str(block["id"])] = (x, y_cursor + (row_height - h) / 2, block_w, h)
+        y_cursor += row_height + block_gap_y
+
+    frame_h = max(180, y_cursor - frame_y - block_gap_y + padding_bottom)
+    return positions, frame_h
+
+
+def whiteboard_modular_positions(
+    content: dict[str, Any],
+    blocks: list[dict[str, Any]],
+    top: float,
+    canvas_width: float,
+) -> tuple[dict[str, tuple[float, float, float, float]], list[dict[str, Any]]]:
+    margin = 70
+    content_width = canvas_width - 2 * margin
+    specs = module_specs(content, blocks)
+    groups: dict[str, list[dict[str, Any]]] = {str(spec["id"]): [] for spec in specs}
+    for block in blocks:
+        module_id = block_module_key(block)
+        groups.setdefault(module_id, []).append(block)
+
+    visible_specs = [spec for spec in specs if groups.get(str(spec["id"]))]
+    positions: dict[str, tuple[float, float, float, float]] = {}
+    frames: list[dict[str, Any]] = []
+    full_specs: list[dict[str, Any]] = []
+    regular_specs: list[dict[str, Any]] = []
+    for index, spec in enumerate(visible_specs):
+        if is_full_width_module(spec, index, len(visible_specs)):
+            full_specs.append(spec)
+        else:
+            regular_specs.append(spec)
+
+    y_cursor = top
+    frame_gap_y = 56
+    for spec in full_specs:
+        frame_x = margin
+        frame_w = content_width
+        module_positions, frame_h = layout_module_content(groups[str(spec["id"])], spec, frame_x, y_cursor, frame_w)
+        positions.update(module_positions)
+        frames.append({"id": spec["id"], "title": spec.get("title") or spec["id"], "x": frame_x, "y": y_cursor, "w": frame_w, "h": frame_h})
+        y_cursor += frame_h + frame_gap_y
+
+    frame_gap_x = 62
+    frame_w = (content_width - frame_gap_x) / 2
+    for row_start in range(0, len(regular_specs), 2):
+        row_specs = regular_specs[row_start : row_start + 2]
+        row_frames: list[dict[str, Any]] = []
+        row_positions: list[dict[str, tuple[float, float, float, float]]] = []
+        row_heights: list[float] = []
+        for index, spec in enumerate(row_specs):
+            actual_frame_w = content_width if len(row_specs) == 1 else frame_w
+            frame_x = margin if len(row_specs) == 1 or index == 0 else margin + frame_w + frame_gap_x
+            module_positions, frame_h = layout_module_content(groups[str(spec["id"])], spec, frame_x, y_cursor, actual_frame_w)
+            row_positions.append(module_positions)
+            row_heights.append(frame_h)
+            row_frames.append(
+                {
+                    "id": spec["id"],
+                    "title": spec.get("title") or spec["id"],
+                    "x": frame_x,
+                    "y": y_cursor,
+                    "w": actual_frame_w,
+                    "h": frame_h,
+                },
+            )
+        row_h = max(row_heights, default=180)
+        for frame in row_frames:
+            frame["h"] = row_h
+            frames.append(frame)
+        for module_positions in row_positions:
+            positions.update(module_positions)
+        y_cursor += row_h + frame_gap_y
+    return positions, frames
 
 
 def top_frame_min_height(title: str, body: str, width: float) -> float:
@@ -1268,6 +1496,7 @@ def add_whiteboard_block(
     icon_space = 92 if icon_name and w > 260 else 0
     text_x = x + 22 + icon_space
     text_w = int(max(130, w - 44 - icon_space))
+    default_align = "center" if shape in {"circle", "ellipse", "oval"} or kind in {"client", "actor", "user"} else "left"
     text_block = rich_text_block_svg(
         str(block.get("title") or ""),
         str(block.get("body") or ""),
@@ -1275,13 +1504,13 @@ def add_whiteboard_block(
         plus_text_color(block),
         int(block.get("title_size") or 28),
         int(block.get("body_size") or 20),
-        align=str(block.get("align") or "left").lower(),
+        align=str(block.get("align") or default_align).lower(),
         font_family=DIAGRAM_FONT,
     )
     key = f"wb_block_{block['id']}"
     blocks_svg[key] = text_block
     text_y = fit_text_y(y, h, text_block["height"])
-    align = str(block.get("align") or "left").lower()
+    align = str(block.get("align") or default_align).lower()
     if icon_space:
         text_x = x + icon_space + (w - icon_space - text_block["width"]) / 2
     elif align == "center":
@@ -1555,9 +1784,12 @@ def build_whiteboard_scene(content: dict[str, Any], slug: str) -> tuple[dict[str
 
     raw_blocks = content.get("blocks") or content.get("nodes") or []
     blocks = [normalize_block(block, index) for index, block in enumerate(raw_blocks)]
-    layout = str(content.get("layout") or "auto")
+    planning = content.get("planning") if isinstance(content.get("planning"), dict) else {}
+    layout = str(content.get("layout") or planning.get("diagram_strategy") or "auto")
     if layout.lower() == "auto":
-        if any(str(block.get("lane") or block.get("side") or "") for block in blocks):
+        if content.get("modules") or planning.get("modules") or any(block_module_key(block) != "main" for block in blocks):
+            layout = "modular-composite"
+        elif any(str(block.get("lane") or block.get("side") or "") for block in blocks):
             layout = "comparison"
         elif any(block_kind(block) in {"service", "api", "database", "db", "cache", "queue", "storage", "client", "actor", "user"} for block in blocks):
             layout = "architecture"
@@ -1565,7 +1797,14 @@ def build_whiteboard_scene(content: dict[str, Any], slug: str) -> tuple[dict[str
             layout = "concept-map"
         else:
             layout = "pipeline"
-    positions = whiteboard_positions(blocks, layout, y_cursor, canvas_width)
+    module_frames: list[dict[str, Any]] = []
+    if layout.lower() in MODULAR_LAYOUTS:
+        positions, module_frames = whiteboard_modular_positions(content, blocks, y_cursor, canvas_width)
+    else:
+        positions = whiteboard_positions(blocks, layout, y_cursor, canvas_width)
+
+    for frame in module_frames:
+        add_module_frame(elements, files, blocks_svg, rng, frame, now)
 
     for index, block in enumerate(blocks):
         block_id = str(block["id"])
@@ -1598,6 +1837,17 @@ def build_whiteboard_scene(content: dict[str, Any], slug: str) -> tuple[dict[str
         elif layout.lower() in {"map", "concept", "concept-map", "concept_map"}:
             for block in blocks[1:]:
                 connectors.append({"from": blocks[0]["id"], "to": block["id"]})
+        elif layout.lower() in MODULAR_LAYOUTS:
+            specs = module_specs(content, blocks)
+            previous_tail = None
+            for spec in specs:
+                module_blocks = [block for block in blocks if block_module_key(block) == str(spec["id"])]
+                for idx in range(len(module_blocks) - 1):
+                    connectors.append({"from": module_blocks[idx]["id"], "to": module_blocks[idx + 1]["id"]})
+                if previous_tail and module_blocks:
+                    connectors.append({"from": previous_tail["id"], "to": module_blocks[0]["id"]})
+                if module_blocks:
+                    previous_tail = module_blocks[-1]
         else:
             for idx in range(len(blocks) - 1):
                 connectors.append({"from": blocks[idx]["id"], "to": blocks[idx + 1]["id"]})
@@ -1664,7 +1914,10 @@ def build_whiteboard_scene(content: dict[str, Any], slug: str) -> tuple[dict[str
             )
             elements[-1]["customData"].update({"role": "connector_label", "from": src, "to": dst})
 
-    max_y = max((y + h for x, y, w, h in positions.values()), default=y_cursor)
+    max_y = max(
+        max((y + h for x, y, w, h in positions.values()), default=y_cursor),
+        max((float(frame["y"]) + float(frame["h"]) for frame in module_frames), default=y_cursor),
+    )
     callouts = list(content.get("callouts") or [])
     for index, callout in enumerate(callouts):
         default_w = 420 if index < 2 else 620

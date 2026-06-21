@@ -38,6 +38,34 @@ The generated board explains the material through native blocks, arrows, compari
 
 The content step is intentionally LLM-heavy: the agent should first infer what a strong candidate would understand, then split output into two layers. The board contains professional whiteboard content: design choices, mechanisms, constraints, data flows, and tradeoffs. The `talk_track` contains the candidate-ready wording. Blocks should not be keyword flashcards, but they also should not sound like coaching notes.
 
+Before drawing, the agent should do a compact pre-drawing plan. For short material, a single comparison, pipeline, concept map, or architecture board is usually enough. For larger system-design material, use `layout: "modular-composite"` and split the board into modules. Good signals for modular mode include: more than five meaningful entities, more than two flows, multiple technical types (API, storage, cache, queue, consistency, failure recovery), or a source paragraph that mixes requirements, architecture, tradeoffs, and failure modes.
+
+The planning shape can be embedded in the JSON so another host can understand the intent:
+
+```json
+{
+  "planning": {
+    "complexity": "high",
+    "diagram_strategy": "modular-composite",
+    "reason": "The source mixes read path, booking path, inventory consistency, payment failure handling, and operational tradeoffs.",
+    "signals": {
+      "entities": 9,
+      "flows": 4,
+      "technical_types": ["API", "cache", "queue", "database", "consistency", "payment"]
+    },
+    "modules": [
+      {"id": "overview", "title": "System overview", "layout": "overview", "full_width": true},
+      {"id": "browse", "title": "Browse/read path", "layout": "pipeline"},
+      {"id": "booking", "title": "Booking/write path", "layout": "pipeline"},
+      {"id": "inventory", "title": "Consistency boundary", "layout": "concept"},
+      {"id": "payment", "title": "Payment recovery", "layout": "pipeline"}
+    ]
+  }
+}
+```
+
+Blocks can then set `"module": "booking"` or any matching module id. The renderer draws dashed module frames and keeps arrows routed around unrelated blocks.
+
 The renderer follows the Excalidraw+ docs model as closely as possible while staying offline-compatible: scenes are built from native Excalidraw blocks and connector elements, with semantic metadata for blocks, labels, and arrows. The local renderer does not require the Excalidraw+ MCP, but the same JSON structure can be adapted to MCP `edit_scene_content` flows when a host exposes that tool.
 
 ## Recommended Architecture
@@ -100,6 +128,11 @@ After the plugin or skill is installed in a host:
   "language": "English",
   "style": "excalidraw-plus",
   "layout": "comparison",
+  "planning": {
+    "complexity": "medium",
+    "diagram_strategy": "comparison",
+    "reason": "The source is a CP versus AP tradeoff."
+  },
   "summary": "CAP is a partition-time product decision.",
   "task": "Ask which failure hurts more during a partition: stale data or failed requests.",
   "constraints": [

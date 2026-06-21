@@ -328,7 +328,7 @@ def main() -> None:
         compact_counts = ", ".join(f"{key}={value}" for key, value in sorted(counts.items()))
         print(f"PASS {case_path.name} [{layout}] {compact_counts} -> {preview}")
 
-    required_layouts = {"architecture", "comparison", "concept-map", "decision", "pipeline"}
+    required_layouts = {"architecture", "comparison", "concept-map", "decision", "modular-composite", "pipeline"}
     missing = required_layouts - layouts
     if missing:
         raise AssertionError(f"Missing required layout coverage: {sorted(missing)}")
