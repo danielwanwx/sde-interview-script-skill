@@ -83,7 +83,8 @@ Renderer invariants:
 - Text must fit inside its parent block; blocks grow vertically when needed.
 - Connectors leave from block edges and route around unrelated blocks.
 - Connectors should leave and enter block edges perpendicularly using short port stubs; avoid long segments that run parallel against a block border.
-- Connector labels avoid blocks where possible.
+- Connector labels use their own breathing room: keep them beside the line, away from blocks, and wide enough that Chinese/English text does not stack tightly.
+- Whiteboard previews keep bottom padding beyond the lowest block so screenshots and SVG previews do not crop the final row.
 - Decorative icons are opt-in, because they reduce text width and increase overlap risk.
 
 This is deliberately not a `rules` or `CLAUDE.md` package. Rules are too host-specific and passive; plugin + skill packaging gives installable discovery, namespaced invocation, bundled scripts, and optional MCP wiring.

@@ -107,7 +107,8 @@ Hard visual rules:
 - Text must fit inside its parent block. If content is important, increase the block height instead of letting text escape.
 - Arrows and connector lines must not pass through unrelated blocks. Move blocks or let the renderer route around obstacles.
 - Arrows should leave and enter block edges perpendicularly with short port stubs. Avoid routes that skim alongside a block edge or run parallel against the border before entering.
-- Connector labels should sit beside lines and avoid blocks; keep labels short.
+- Connector labels should sit beside lines with real breathing room; keep them short, wide enough to avoid cramped wrapping, and away from block borders.
+- Leave bottom breathing room on the whiteboard so the lowest block is fully visible in SVG previews and chat screenshots.
 - Prefer clean block placement over manual point hacks. Use explicit `points` only when a custom route is truly clearer.
 - Decorative vector icons are opt-in only with `show_icon: true`.
 
@@ -228,7 +229,7 @@ Host-specific delivery:
 - Rows should use the available width and align cleanly at the left/right edges when possible.
 - Left-align block body text by default; center only titles or tiny actor/client nodes when it improves scanning.
 - Readable line breaks: prefer sentence-level lines over phrase fragments.
-- Never accept a rendered scene where text escapes a block, an arrow crosses through a block, or an arrow visually hugs a block border instead of entering perpendicularly.
+- Never accept a rendered scene where text escapes a block, an arrow crosses through a block, an arrow visually hugs a block border instead of entering perpendicularly, or the lowest row is cropped by the preview.
 
 ## Quality Bar
 

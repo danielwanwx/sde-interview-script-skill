@@ -51,6 +51,12 @@ PLUS_YELLOW = "#fffbe6"
 PLUS_GREEN = "#f1fcf3"
 PLUS_MINT = "#eef8ff"
 
+WHITEBOARD_BOTTOM_PADDING = 185
+DIAGRAM_BOTTOM_PADDING = 140
+CONNECTOR_LABEL_MAX_WIDTH = 300
+CONNECTOR_LABEL_GAP = 24
+CONNECTOR_LABEL_OBSTACLE_PADDING = 14
+
 MODULAR_LAYOUTS = {
     "modular",
     "composite",
@@ -1151,21 +1157,27 @@ def choose_label_position(
         if abs(y1 - y2) < 0.001:
             candidates.extend(
                 [
-                    (mid_x - label_block["width"] / 2, mid_y - label_block["height"] - 12),
-                    (mid_x - label_block["width"] / 2, mid_y + 12),
+                    (
+                        mid_x - label_block["width"] / 2,
+                        mid_y - label_block["height"] - CONNECTOR_LABEL_GAP,
+                    ),
+                    (mid_x - label_block["width"] / 2, mid_y + CONNECTOR_LABEL_GAP),
                 ],
             )
         else:
             candidates.extend(
                 [
-                    (mid_x + 12, mid_y - label_block["height"] / 2),
-                    (mid_x - label_block["width"] - 12, mid_y - label_block["height"] / 2),
+                    (mid_x + CONNECTOR_LABEL_GAP, mid_y - label_block["height"] / 2),
+                    (
+                        mid_x - label_block["width"] - CONNECTOR_LABEL_GAP,
+                        mid_y - label_block["height"] / 2,
+                    ),
                 ],
             )
     mid = points[len(points) // 2]
     candidates.append((mid[0] - label_block["width"] / 2, mid[1] - label_block["height"] / 2))
 
-    inflated = [inflated_rect(obstacle, 8) for obstacle in obstacles]
+    inflated = [inflated_rect(obstacle, CONNECTOR_LABEL_OBSTACLE_PADDING) for obstacle in obstacles]
 
     def usable(candidate_x: float, candidate_y: float) -> bool:
         bounds = label_bounds(candidate_x, candidate_y, label_block)
@@ -1180,7 +1192,7 @@ def choose_label_position(
             return x, y
 
     base_candidates = list(candidates)
-    for radius in (32, 64, 96, 132, 176):
+    for radius in (40, 80, 120, 168, 220):
         offsets = [
             (0, -radius),
             (0, radius),
@@ -1979,13 +1991,22 @@ def build_whiteboard_scene(content: dict[str, Any], slug: str) -> tuple[dict[str
         elements.append(connector_element)
         label = str(connector.get("label") or "")
         if label:
-            label_block = text_block_svg(label, 17, 230, PLUS_STROKE, 6, 8, DIAGRAM_FONT, align="center")
+            label_block = text_block_svg(
+                label,
+                17,
+                CONNECTOR_LABEL_MAX_WIDTH,
+                PLUS_STROKE,
+                10,
+                14,
+                DIAGRAM_FONT,
+                align="center",
+            )
             label_key = f"wb_connector_{index}"
             blocks_svg[label_key] = label_block
             label_dx = dimension(connector.get("label_dx") or connector.get("labelDx"), 0, canvas_width)
             label_dy = dimension(connector.get("label_dy") or connector.get("labelDy"), 0, 1600)
             label_obstacles = [
-                inflated_rect(pos, 8)
+                inflated_rect(pos, CONNECTOR_LABEL_OBSTACLE_PADDING)
                 for pos in positions.values()
             ]
             label_x, label_y = choose_label_position(points, label_block, label_obstacles, canvas_width, label_dx, label_dy)
@@ -2026,7 +2047,7 @@ def build_whiteboard_scene(content: dict[str, Any], slug: str) -> tuple[dict[str
         add_whiteboard_block(elements, files, blocks_svg, rng, note, (x, y, w, h), index, now)
         max_y = max(max_y, y + h)
 
-    canvas_height = int(max_y + 95)
+    canvas_height = int(max_y + WHITEBOARD_BOTTOM_PADDING)
     scene = {
         "type": "excalidraw",
         "version": 2,
@@ -2308,15 +2329,15 @@ def build_diagram_scene(
                 blocks_svg[key] = text_block_svg(
                     label,
                     18 if not plus_style else 19,
-                    220,
+                    CONNECTOR_LABEL_MAX_WIDTH,
                     "#1e3a8a" if not plus_style else PLUS_STROKE,
-                    8,
                     10,
+                    14,
                     DIAGRAM_FONT if plus_style else HANDWRITING_FONT,
                     align="center",
                 )
                 label_obstacles = [
-                    inflated_rect(pos, 8)
+                    inflated_rect(pos, CONNECTOR_LABEL_OBSTACLE_PADDING)
                     for pos in positions.values()
                 ]
                 label_x, label_y = choose_label_position(points, blocks_svg[key], label_obstacles, canvas_width)
@@ -2362,15 +2383,15 @@ def build_diagram_scene(
             blocks_svg[key] = text_block_svg(
                 label,
                 18 if not plus_style else 19,
-                220,
+                CONNECTOR_LABEL_MAX_WIDTH,
                 "#1e3a8a" if not plus_style else PLUS_STROKE,
-                8,
                 10,
+                14,
                 DIAGRAM_FONT if plus_style else HANDWRITING_FONT,
                 align="center",
             )
             label_obstacles = [
-                inflated_rect(pos, 8)
+                inflated_rect(pos, CONNECTOR_LABEL_OBSTACLE_PADDING)
                 for pos in positions.values()
             ]
             label_x, label_y = choose_label_position(points if plus_style else [[label_x, label_y], [label_x, label_y]], blocks_svg[key], label_obstacles, canvas_width)
@@ -2431,7 +2452,7 @@ def build_diagram_scene(
         add_image_block(elements, files, rng, "talk", blocks_svg["talk"], margin + 32, y + 26, now)
         max_y = y + h
 
-    canvas_height = int(max_y + 90)
+    canvas_height = int(max_y + DIAGRAM_BOTTOM_PADDING)
     scene = {
         "type": "excalidraw",
         "version": 2,
