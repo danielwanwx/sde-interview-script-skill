@@ -83,7 +83,7 @@ Renderer invariants:
 - Text must fit inside its parent block; blocks grow vertically when needed.
 - Connectors leave from block edges and route around unrelated blocks.
 - Connectors should leave and enter block edges perpendicularly using short port stubs; avoid long segments that run parallel against a block border.
-- Connector labels use their own breathing room: keep them beside the line, away from blocks, and wide enough that Chinese/English text does not stack tightly.
+- Connector labels should read as line annotations: keep them close to the line, slightly offset from the stroke, and only move them farther when needed to avoid blocks.
 - Whiteboard previews keep bottom padding beyond the lowest block so screenshots and SVG previews do not crop the final row.
 - Decorative icons are opt-in, because they reduce text width and increase overlap risk.
 

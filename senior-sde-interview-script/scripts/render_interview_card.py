@@ -54,8 +54,8 @@ PLUS_MINT = "#eef8ff"
 WHITEBOARD_BOTTOM_PADDING = 185
 DIAGRAM_BOTTOM_PADDING = 140
 CONNECTOR_LABEL_MAX_WIDTH = 300
-CONNECTOR_LABEL_GAP = 24
-CONNECTOR_LABEL_OBSTACLE_PADDING = 14
+CONNECTOR_LABEL_GAP = 6
+CONNECTOR_LABEL_OBSTACLE_PADDING = 10
 
 MODULAR_LAYOUTS = {
     "modular",
@@ -1192,7 +1192,7 @@ def choose_label_position(
             return x, y
 
     base_candidates = list(candidates)
-    for radius in (40, 80, 120, 168, 220):
+    for radius in (18, 36, 64, 96, 136):
         offsets = [
             (0, -radius),
             (0, radius),

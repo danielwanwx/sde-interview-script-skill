@@ -107,7 +107,7 @@ Hard visual rules:
 - Text must fit inside its parent block. If content is important, increase the block height instead of letting text escape.
 - Arrows and connector lines must not pass through unrelated blocks. Move blocks or let the renderer route around obstacles.
 - Arrows should leave and enter block edges perpendicularly with short port stubs. Avoid routes that skim alongside a block edge or run parallel against the border before entering.
-- Connector labels should sit beside lines with real breathing room; keep them short, wide enough to avoid cramped wrapping, and away from block borders.
+- Connector labels should feel attached to the line: keep them close to the stroke, slightly offset for readability, and move them farther only when needed to avoid blocks.
 - Leave bottom breathing room on the whiteboard so the lowest block is fully visible in SVG previews and chat screenshots.
 - Prefer clean block placement over manual point hacks. Use explicit `points` only when a custom route is truly clearer.
 - Decorative vector icons are opt-in only with `show_icon: true`.
