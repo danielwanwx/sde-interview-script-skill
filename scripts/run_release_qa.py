@@ -219,6 +219,29 @@ def validate_case_metadata(case_path: Path, fixture: dict[str, Any], metadata: d
     if len(fixture.get("blocks") or []) < 4:
         raise AssertionError(f"{case_path.name}: release fixtures need at least four board blocks")
 
+    qa = fixture.get("qa") if isinstance(fixture.get("qa"), dict) else {}
+    required_terms = qa.get("required_terms")
+    if isinstance(required_terms, list):
+        haystack_parts = [
+            str(fixture.get("title") or ""),
+            str(fixture.get("summary") or ""),
+            str(fixture.get("task") or ""),
+            coerce_release_text(fixture.get("constraints")),
+            str(fixture.get("talk_track") or ""),
+        ]
+        for block in fixture.get("blocks") or []:
+            if isinstance(block, dict):
+                haystack_parts.append(str(block.get("title") or ""))
+                haystack_parts.append(str(block.get("body") or block.get("text") or ""))
+        for callout in fixture.get("callouts") or []:
+            if isinstance(callout, dict):
+                haystack_parts.append(str(callout.get("title") or ""))
+                haystack_parts.append(str(callout.get("body") or callout.get("text") or ""))
+        haystack = "\n".join(haystack_parts)
+        missing_terms = [str(term) for term in required_terms if str(term) not in haystack]
+        if missing_terms:
+            raise AssertionError(f"{case_path.name}: missing required coherence terms: {missing_terms}")
+
     block_count = len(fixture.get("blocks") or [])
     size = metadata["content_size"]
     if size == "short" and block_count > 5:
@@ -252,6 +275,14 @@ def absolute_points(element: dict[str, Any]) -> list[list[float]]:
     y = float(element.get("y", 0))
     points = element.get("points") or [[0, 0], [element.get("width", 0), element.get("height", 0)]]
     return [[x + float(point[0]), y + float(point[1])] for point in points]
+
+
+def coerce_release_text(value: Any) -> str:
+    if isinstance(value, list):
+        return "\n".join(str(item) for item in value)
+    if isinstance(value, dict):
+        return "\n".join(f"{key}: {item}" for key, item in value.items())
+    return str(value or "")
 
 
 def rect_to_axis_segment_distance(

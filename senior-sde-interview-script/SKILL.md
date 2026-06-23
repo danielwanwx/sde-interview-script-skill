@@ -34,6 +34,28 @@ Start with one sentence summarizing what the excerpt is really about. Then build
 
 The board should explain the topic before the talk track is read. The board itself should look like a strong candidate's live whiteboard, not coaching notes about how to answer. If included, the talk track should be short, usually 3-5 lines, and sound like a candidate making a judgment, not a textbook reciting definitions.
 
+## Coherence First
+
+The board must have one clear reading path. It should not be a collection of correct but disconnected notes. Before creating JSON, choose this path:
+
+1. **Mental model**: the one visual idea that makes the topic click.
+2. **Concrete interview scenario**: a small realistic request, query, API call, or failure case.
+3. **Why the naive design breaks**: show the wrong shape, wrong boundary, wrong ordering, or wrong failure mode.
+4. **Better mechanism**: show how the stronger design changes that shape, boundary, ordering, or failure handling.
+5. **Correctness / decision rule**: end with what still must be verified and when this design is the right choice.
+
+If the reader has to infer the causal chain between blocks, revise the board. The goal is not only coverage; it is a whiteboard that feels easy to follow in real time.
+
+Use these reusable visual patterns:
+
+- **Shape mismatch**: query/data shape is the key. Example: geospatial radius search asks for a circle, while separate lat/lng B-trees produce strips or rectangles. Show target shape -> wrong index shape -> over-fetch -> spatial candidate reduction -> exact distance check.
+- **Boundary mismatch**: correctness depends on ownership of a boundary. Example: inventory consistency, idempotency, authorization, cache invalidation.
+- **Time/path mismatch**: correctness depends on ordering over time. Example: retries, pagination drift, CDC lag, replication, async jobs.
+- **Tradeoff fork**: two valid choices optimize different failure modes. Example: CP vs AP, REST vs GraphQL, offset vs cursor.
+- **Lifecycle**: the answer is a sequence of states. Example: seat hold -> payment -> confirmation -> expiry.
+
+For multidimensional search, proximity search, ranking, or filtering problems, use a storyboard rather than a loose concept map. Show the user request shape, the naive query/index shape, why that shape over-fetches or misses the goal, the candidate-reduction mechanism, and the final exact correctness check.
+
 ## Board Content Vs Talk Track
 
 This skill is not a keyword summarizer. Treat the source paragraph as raw material for a senior-candidate answer, but separate what goes on the board from what the candidate says aloud.
@@ -78,10 +100,11 @@ Use `completion_mode: "none"` for complete sources, `"model_background"` for sta
 Before creating the board JSON, infer and write from this internal structure:
 
 1. **Whiteboard objective.** The concrete design question being solved.
-2. **Professional board blocks.** Decisions, mechanisms, and boundaries that can stand on a live system-design whiteboard.
-3. **Judgment chain.** 2-4 blocks that each explain what design choice exists, why it matters, and what mechanism follows.
-4. **Senior caveat.** One failure mode, operational cost, retry/idempotency issue, consistency boundary, caching caveat, or product implication.
-5. **Speakable answer.** If requested outside the image, produce a 60-90 second answer in the requested language.
+2. **Mental model.** The simplest visual frame that makes the issue obvious.
+3. **Professional board blocks.** Decisions, mechanisms, and boundaries that can stand on a live system-design whiteboard.
+4. **Judgment chain.** 2-4 blocks that each explain what design choice exists, why it matters, and what mechanism follows.
+5. **Senior caveat.** One failure mode, operational cost, retry/idempotency issue, consistency boundary, caching caveat, or product implication.
+6. **Speakable answer.** If requested outside the image, produce a 60-90 second answer in the requested language.
 
 Also do a compact pre-drawing planning pass before choosing the final layout:
 
@@ -135,6 +158,14 @@ Good Chinese phrases when Chinese is requested:
 - "这里关键不是...而是..."
 
 Avoid repeating "我在项目中..." or "当我遇到..." in every paragraph.
+
+Chinese quality rules:
+
+- Preserve the original meaning, but make the Chinese sound like something a strong candidate would actually say.
+- Avoid stiff literal translations and obscure terms. Use plain Chinese first, then keep the English term when it helps precision.
+- Introduce technical terms naturally: `false positive（误命中 / 多取的候选）`, `locality（相近的数据放得更近）`, `bounding box（外接矩形）`.
+- Prefer direct verbs such as `缩小候选集`, `多取了一批点`, `最后再算真实距离`, `先挡住重复请求`, `把更新异步推下去`.
+- If a Chinese translation makes the sentence harder to understand, keep the English term and explain it briefly.
 
 ## Choose A Layout
 
@@ -283,6 +314,8 @@ Host-specific delivery:
 
 - One sentence summary first, then a diagram-first explanation.
 - No long pasted script block unless the user explicitly asks for copyable text.
+- A good board has one obvious path through it. It should not feel like a pile of correct but disconnected notes.
+- Start with the strongest mental model, not with definitions. For geospatial search, the mental model is "circle vs strip/rectangle"; for retries it might be "same request replayed"; for CAP it is "partition-time choice".
 - Convert paragraphs into relationships: choices, causes, consequences, examples, and failure modes.
 - Show senior judgment through tradeoffs, production implications, and boundary conditions.
 - If the board still looks like a long essay with a tiny flowchart, revise the JSON before rendering.

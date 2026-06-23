@@ -37,6 +37,34 @@ Instead:
 - Prefer one sentence per line when it fits. Do not manually break one sentence into many short fragments.
 - Do not use the old `summary + long script + four flow boxes` layout.
 
+## Coherence First
+
+A board is successful only if a reader can follow it without reading the talk track. Before writing blocks, choose a single reading path:
+
+1. **Mental model**: the one picture or analogy that makes the topic obvious.
+2. **Concrete example**: a small realistic request, query, API call, or failure scenario.
+3. **Why the naive approach breaks**: show the wrong shape, wrong boundary, wrong ordering, or wrong failure mode.
+4. **Correct mechanism**: show how the better design changes the shape, boundary, ordering, or failure handling.
+5. **Correctness / choice rule**: end with what still must be verified and when to choose this option.
+
+Do not scatter accurate facts into disconnected blocks. If the user has to assemble the causal chain themselves, revise the board.
+
+Use these visual patterns when they fit:
+
+- **Shape mismatch**: when the core issue is that the query shape and index/data shape do not match. Example: geospatial radius search wants a circle, while separate lat/lng B-trees return strips or rectangles. Draw target shape -> wrong shape -> candidate explosion -> spatial index -> exact filter.
+- **Boundary mismatch**: when correctness depends on one component owning a boundary. Example: inventory, payment, idempotency, authorization, or cache invalidation.
+- **Time/path mismatch**: when the issue is ordering over time. Example: retries, pagination drift, CDC lag, replication, async processing.
+- **Tradeoff fork**: when two valid choices optimize different failure modes. Example: CP vs AP, REST vs GraphQL, offset vs cursor.
+- **Lifecycle**: when the mechanism is a sequence of states. Example: seat hold -> payment -> confirmation -> expiry.
+
+For multidimensional search, proximity search, ranking, or filtering problems, prefer a storyboard over a loose concept map. Show:
+
+- the user request shape,
+- the naive index/query shape,
+- why that shape over-fetches or misses the point,
+- the candidate-reduction mechanism,
+- the final exact correctness check.
+
 ## Board Content Vs Talk Track
 
 For interview or technical-learning material, do not summarize the paragraph mechanically. First infer what an excellent candidate would understand, then separate the output into two layers:
@@ -81,10 +109,11 @@ Use `completion_mode: "none"` for complete sources, `"model_background"` for sta
 Before writing the JSON, mentally produce this content plan:
 
 1. **Whiteboard objective**: the concrete design question or concept being solved.
-2. **Board blocks**: professional labels and compact design statements.
-3. **Mechanisms**: what technique, storage choice, protocol, or data flow implements the decision.
-4. **Tradeoffs**: latency, consistency, retry behavior, operational cost, failure mode, or product implication.
-5. **Talk track**: 60-90 seconds when requested, written as direct candidate language.
+2. **Mental model**: the simplest visual frame that makes the issue click.
+3. **Board blocks**: professional labels and compact design statements.
+4. **Mechanisms**: what technique, storage choice, protocol, or data flow implements the decision.
+5. **Tradeoffs**: latency, consistency, retry behavior, operational cost, failure mode, or product implication.
+6. **Talk track**: 60-90 seconds when requested, written as direct candidate language.
 
 Also do a compact pre-drawing planning pass before choosing the final layout:
 
@@ -235,6 +264,10 @@ For `modular-composite`, include `planning.modules` or top-level `modules`, then
 - Use Chinese when the user writes `Chinese`, `用中文`, `in chinese`, or clearly asks for Chinese output.
 - Use any other requested language directly.
 - For bilingual output, make the diagram mostly structural and keep text short.
+- Chinese should preserve the original meaning while sounding natural. Avoid stiff literal translations or rare terms that make the board harder to read.
+- When a technical English term is clearer, keep it with a short Chinese explanation the first time: `false positive（误命中 / 多取的候选）`, `locality（相近的数据放得更近）`, `bounding box（外接矩形）`.
+- Prefer plain Chinese verbs: `缩小候选集`, `多取了一批点`, `最后再算真实距离`, `先挡住重复请求`, `让读请求落到缓存`.
+- Do not use a Chinese translation just because one exists if it makes the sentence less clear.
 
 ## Rendering
 
@@ -268,6 +301,8 @@ Host-specific delivery:
 ## Quality Bar
 
 - Make the picture explain the idea before the talk track is read.
+- A good board has one obvious path through it. It should not feel like a pile of correct but disconnected notes.
+- Start with the strongest mental model, not with definitions. For geospatial search, the mental model is "circle vs strip/rectangle"; for retries it might be "same request replayed"; for CAP it is "partition-time choice".
 - Convert paragraphs into relationships: choices, causes, consequences, examples, and failure modes.
 - For technical interview content, show senior judgment through tradeoffs, production implications, and boundary conditions.
 - If the output still looks like a long essay with a small flowchart, revise the JSON before rendering.

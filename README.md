@@ -37,6 +37,8 @@ Default output is intentionally minimal:
 
 The generated board explains the material through native blocks, arrows, comparisons, system-design component diagrams, and sticky-note callouts. It should look like a clean interview whiteboard, not a long essay pasted into a box. Text should prefer one sentence per line when it fits, with left-aligned block content and rows that use the available width. For interview-style source material, the chat reply should include the copyable talk track after the preview and link so the user can both inspect the diagram and rehearse the answer.
 
+The board should also have a clear reading path. The agent first chooses a mental model, then draws the concrete scenario, the naive failure mode, the better mechanism, and the final correctness or choice rule. This prevents outputs that technically cover the source but feel hard to follow. For example, geospatial search should be framed as "circle vs strip/rectangle": a radius query wants a circular area, separate B-tree indexes produce strips or rectangles, spatial indexes reduce candidates, and exact distance filtering preserves correctness.
+
 The content step is intentionally LLM-heavy: the agent should first infer what a strong candidate would understand, then split output into two layers. The board contains professional whiteboard content: design choices, mechanisms, constraints, data flows, and tradeoffs. The `talk_track` contains the candidate-ready wording. Blocks should not be keyword flashcards, but they also should not sound like coaching notes.
 
 The agent should also do an automatic source-sufficiency check. If the pasted text is already complete, it should only condense and structure it. If the text is partial or thin, it should fill the missing stable background needed for a useful board and talk track, such as mechanisms, tradeoffs, examples, caveats, or production implications. Browsing is reserved for current, version-specific, product-specific, niche, or high-stakes facts; when browsing is used, prefer primary or authoritative sources. The JSON can include `source_notes` with `completeness`, `completion_mode`, `added_points`, and `uncertain_points`, but those notes are not rendered by default.
@@ -90,6 +92,14 @@ Renderer invariants:
 - Whiteboard previews keep bottom padding beyond the lowest block so screenshots and SVG previews do not crop the final row.
 - Block backgrounds use a semantic palette, not random cycling: the same `kind` gets the same fill, and colors communicate role such as client, API, database, cache, queue, storage, warning, note, or answer.
 - Decorative icons are opt-in, because they reduce text width and increase overlap risk.
+
+Content invariants:
+
+- Start with a mental model, not a definition list.
+- Use one obvious left-to-right or top-to-bottom path through the board.
+- Show why the naive approach fails before showing the stronger design.
+- End with the correctness check or decision rule.
+- For Chinese output, preserve the source meaning but use natural Chinese. Keep English technical terms when they are clearer, and explain them briefly rather than forcing awkward translations.
 
 This is deliberately not a `rules` or `CLAUDE.md` package. Rules are too host-specific and passive; plugin + skill packaging gives installable discovery, namespaced invocation, bundled scripts, and optional MCP wiring.
 
