@@ -112,14 +112,14 @@
     }
   ],
   "connectors": [
-    {"from": "query", "to": "one_dim", "label": "naive index"},
-    {"from": "one_dim", "to": "shape_mismatch", "label": "loses 2D meaning"},
-    {"from": "shape_mismatch", "to": "strip", "label": "first failure"},
-    {"from": "strip", "to": "rectangle", "label": "try both ranges"},
-    {"from": "rectangle", "to": "overfetch", "label": "still too broad"},
-    {"from": "overfetch", "to": "locality", "label": "fix the shape"},
-    {"from": "locality", "to": "candidates", "label": "reduce candidates"},
-    {"from": "candidates", "to": "exact", "label": "preserve correctness"}
+    {"from": "query", "to": "one_dim", "label": "普通索引"},
+    {"from": "one_dim", "to": "shape_mismatch", "label": "丢二维"},
+    {"from": "shape_mismatch", "to": "strip", "label": "首次失败"},
+    {"from": "strip", "to": "rectangle", "label": "再试相交"},
+    {"from": "rectangle", "to": "overfetch", "label": "仍过宽"},
+    {"from": "overfetch", "to": "locality", "label": "修正形状"},
+    {"from": "locality", "to": "candidates", "label": "缩小候选"},
+    {"from": "candidates", "to": "exact", "label": "保证正确"}
   ],
   "callouts": [
     {

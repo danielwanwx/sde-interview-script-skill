@@ -143,11 +143,12 @@ def tokenize(text: str) -> list[str]:
     )
 
 
-def wrap_paragraph(paragraph: str, size: int, max_width: int) -> list[str]:
+def wrap_paragraph(paragraph: str, size: int, max_width: int, break_long_words: bool = True) -> list[str]:
     lines: list[str] = []
     line = ""
     line_width = 0.0
-    for token in tokenize(paragraph):
+    tokens = tokenize(paragraph) if break_long_words else re.findall(r"\S+|\s+", paragraph)
+    for token in tokens:
         token = " " if token.isspace() else token
         width = token_width(token, size)
         if line and line_width + width > max_width:
@@ -158,7 +159,7 @@ def wrap_paragraph(paragraph: str, size: int, max_width: int) -> list[str]:
             line += token
             line_width += width
 
-        while line_width > max_width and len(line) > 1:
+        while break_long_words and line_width > max_width and len(line) > 1:
             acc = ""
             acc_width = 0.0
             rest_start = 0
@@ -196,13 +197,13 @@ def split_sentence_units(paragraph: str) -> list[str]:
     return [part.strip() for part in parts if part.strip()]
 
 
-def wrap_text(text: str, size: int, max_width: int) -> list[str | None]:
+def wrap_text(text: str, size: int, max_width: int, break_long_words: bool = True) -> list[str | None]:
     wrapped: list[str | None] = []
     paragraphs = text.split("\n")
     for idx, paragraph in enumerate(paragraphs):
         if paragraph:
             for sentence in split_sentence_units(paragraph):
-                wrapped.extend(wrap_paragraph(sentence, size, max_width))
+                wrapped.extend(wrap_paragraph(sentence, size, max_width, break_long_words))
         else:
             wrapped.append(None)
         if idx != len(paragraphs) - 1:
@@ -219,8 +220,9 @@ def text_block_svg(
     paragraph_gap: int,
     font_family: str = HANDWRITING_FONT,
     align: str = "left",
+    break_long_words: bool = True,
 ) -> dict[str, Any]:
-    lines = wrap_text(text, size, max_width)
+    lines = wrap_text(text, size, max_width, break_long_words)
     line_height = int(size * 1.26) + line_gap
     y = int(size * 1.1)
     text_nodes: list[str] = []
@@ -239,7 +241,12 @@ def text_block_svg(
             f'font-family="{font_family}"{anchor}>{html.escape(line)}</text>'
         )
         y += line_height
-    width = svg_width if centered else min(max_width + 8, int(math.ceil(max_line_width)) + 10)
+    if centered:
+        width = svg_width
+    elif break_long_words:
+        width = min(max_width + 8, int(math.ceil(max_line_width)) + 10)
+    else:
+        width = max(max_width + 8, int(math.ceil(max_line_width)) + 10)
     height = max(1, y - int(size * 0.3))
     svg = (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
@@ -248,7 +255,7 @@ def text_block_svg(
     data_url = "data:image/svg+xml;base64," + base64.b64encode(svg.encode("utf-8")).decode(
         "ascii",
     )
-    return {"dataURL": data_url, "width": width, "height": height, "svg": svg}
+    return {"dataURL": data_url, "width": width, "height": height, "svg": svg, "lines": lines}
 
 
 def rich_text_block_svg(
@@ -2106,6 +2113,7 @@ def build_whiteboard_scene(content: dict[str, Any], slug: str) -> tuple[dict[str
                 14,
                 DIAGRAM_FONT,
                 align="left",
+                break_long_words=False,
             )
             label_key = f"wb_connector_{index}"
             blocks_svg[label_key] = label_block
@@ -2123,7 +2131,13 @@ def build_whiteboard_scene(content: dict[str, Any], slug: str) -> tuple[dict[str
                 label_y,
                 now,
             )
-            elements[-1]["customData"].update({"role": "connector_label", "from": src, "to": dst})
+            elements[-1]["customData"].update({
+                "role": "connector_label",
+                "from": src,
+                "to": dst,
+                "label": label,
+                "labelLines": [line for line in label_block.get("lines", []) if line is not None],
+            })
             connector_label_max_y = max(connector_label_max_y, label_y + label_block["height"])
 
     max_y = max(
@@ -2437,6 +2451,7 @@ def build_diagram_scene(
                     14,
                     DIAGRAM_FONT if plus_style else HANDWRITING_FONT,
                     align="left",
+                    break_long_words=False,
                 )
                 label_obstacles = list(positions.values())
                 label_x, label_y = choose_label_position(points, blocks_svg[key], label_obstacles, canvas_width)
@@ -2450,7 +2465,13 @@ def build_diagram_scene(
                     label_y,
                     now,
                 )
-                elements[-1]["customData"].update({"role": "connector_label", "from": src, "to": dst})
+                elements[-1]["customData"].update({
+                    "role": "connector_label",
+                    "from": src,
+                    "to": dst,
+                    "label": label,
+                    "labelLines": [line for line in blocks_svg[key].get("lines", []) if line is not None],
+                })
             continue
         src = str(connector.get("from") or connector.get("source") or "")
         dst = str(connector.get("to") or connector.get("target") or "")
@@ -2488,6 +2509,7 @@ def build_diagram_scene(
                 14,
                 DIAGRAM_FONT if plus_style else HANDWRITING_FONT,
                 align="left",
+                break_long_words=False,
             )
             label_obstacles = list(positions.values())
             label_x, label_y = choose_label_position(points if plus_style else [[label_x, label_y], [label_x, label_y]], blocks_svg[key], label_obstacles, canvas_width)
@@ -2501,7 +2523,13 @@ def build_diagram_scene(
                 label_y,
                 now,
             )
-            elements[-1]["customData"].update({"role": "connector_label", "from": src, "to": dst})
+            elements[-1]["customData"].update({
+                "role": "connector_label",
+                "from": src,
+                "to": dst,
+                "label": label,
+                "labelLines": [line for line in blocks_svg[key].get("lines", []) if line is not None],
+            })
 
     max_y = max((y + h for x, y, w, h in positions.values()), default=y_cursor)
     for index, callout in enumerate(content.get("callouts") or []):

@@ -12,6 +12,7 @@ import argparse
 import json
 import math
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -321,6 +322,26 @@ def bounds_overlap(
     )
 
 
+def validate_connector_label_words(label_text: str, label_lines: list[Any], case_name: str, key: tuple[str, str]) -> None:
+    lines = [str(line) for line in label_lines if str(line).strip()]
+    if not lines:
+        return
+    for token in re.findall(r"[A-Za-z0-9_]+", label_text):
+        if len(token) <= 1:
+            continue
+        if not any(token in line for line in lines):
+            raise AssertionError(
+                f"{case_name}: connector label {key[0]}->{key[1]} splits word {token!r} across lines",
+            )
+    for token in re.findall(r"[\u3400-\u9fff]+", label_text):
+        if len(token) <= 1:
+            continue
+        if not any(token in line for line in lines):
+            raise AssertionError(
+                f"{case_name}: connector label {key[0]}->{key[1]} splits phrase {token!r} across lines",
+            )
+
+
 def validate_release_scene(case_path: Path, fixture: dict[str, Any], excalidraw_path: Path, preview_path: Path) -> None:
     scene = load_json(excalidraw_path)
     _, canvas_height = smoke.svg_size(preview_path)
@@ -384,6 +405,7 @@ def validate_release_scene(case_path: Path, fixture: dict[str, Any], excalidraw_
     for label in labels:
         custom = label.get("customData") or {}
         key = (str(custom.get("from") or ""), str(custom.get("to") or ""))
+        validate_connector_label_words(str(custom.get("label") or ""), list(custom.get("labelLines") or []), case_path.name, key)
         connector = connectors.get(key)
         if not connector:
             continue
