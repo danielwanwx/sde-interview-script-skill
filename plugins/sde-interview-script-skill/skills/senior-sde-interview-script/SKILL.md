@@ -17,8 +17,9 @@ Default chat response:
 
 1. Rendered preview image when the host can display it.
 2. Excalidraw link if upload succeeds; otherwise the `.excalidraw` path.
+3. Copyable senior-candidate interview script in the requested language.
 
-Do not paste the script text outside the image unless the user asks for copyable text. If the user asks for a speakable script, put it in chat and keep the board diagram-first.
+When the user pastes a paragraph to test or validate the skill, produce the complete package by default: preview image, editable link/path, and a concise speakable interview script in chat. The board stays diagram-first, but the answer must also include the wording the candidate can directly say.
 
 ## Senior Interview Shape
 
@@ -261,8 +262,8 @@ If the current working directory is not this skill directory, run the script wit
 
 Host-specific delivery:
 
-- Codex/Cursor: return Markdown image for `preview`, then `link` or `.excalidraw` path.
-- Claude Code or terminal-only hosts: return `link` first; if no link exists, return `preview` and `.excalidraw` paths.
+- Codex/Cursor: return Markdown image for `preview`, then `link` or `.excalidraw` path, then the copyable interview script.
+- Claude Code or terminal-only hosts: return `link` first; if no link exists, return `preview` and `.excalidraw` paths; then include the copyable interview script.
 
 ## Visual Style
 

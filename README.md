@@ -33,8 +33,9 @@ Default output is intentionally minimal:
 - a direct preview image when the host can display local images
 - an editable Excalidraw link when upload succeeds
 - a local `.excalidraw` path as fallback
+- a copyable interview talk track when the source is interview prep, system design, API design, or technical study material
 
-The generated board explains the material through native blocks, arrows, comparisons, system-design component diagrams, and sticky-note callouts. It should look like a clean interview whiteboard, not a long essay pasted into a box. Text should prefer one sentence per line when it fits, with left-aligned block content and rows that use the available width. The chat reply should not repeat the visual text unless the user explicitly asks for copyable text.
+The generated board explains the material through native blocks, arrows, comparisons, system-design component diagrams, and sticky-note callouts. It should look like a clean interview whiteboard, not a long essay pasted into a box. Text should prefer one sentence per line when it fits, with left-aligned block content and rows that use the available width. For interview-style source material, the chat reply should include the copyable talk track after the preview and link so the user can both inspect the diagram and rehearse the answer.
 
 The content step is intentionally LLM-heavy: the agent should first infer what a strong candidate would understand, then split output into two layers. The board contains professional whiteboard content: design choices, mechanisms, constraints, data flows, and tradeoffs. The `talk_track` contains the candidate-ready wording. Blocks should not be keyword flashcards, but they also should not sound like coaching notes.
 
@@ -189,7 +190,7 @@ python3 scripts/render_interview_card.py \
 }
 ```
 
-7. Codex/Cursor reply with only the preview image and link/path. Claude Code terminal replies with the link first, then local paths if needed.
+7. Codex/Cursor reply with the preview image, link/path, and copyable talk track. Claude Code terminal replies with the link first, then local paths if needed, then the talk track.
 
 ## Language Selection
 
@@ -272,7 +273,7 @@ Import the repository as a Cursor plugin marketplace or team plugin source. The 
 - optional `mcp.json`
 - bundled renderer scripts under the skill
 
-After installation, paste the excerpt and ask Cursor to use `$card`. Cursor-capable chats should display the local preview image plus the Excalidraw link/path.
+After installation, paste the excerpt and ask Cursor to use `$card`. Cursor-capable chats should display the local preview image plus the Excalidraw link/path and the copyable talk track.
 
 ## Install In Claude Code
 
@@ -300,7 +301,7 @@ Use the short slash command:
 /card <paste text here>
 ```
 
-Claude Code terminal usually cannot inline local images, so the skill defaults to returning the Excalidraw link. If upload is unavailable, it returns the local preview SVG and `.excalidraw` paths.
+Claude Code terminal usually cannot inline local images, so the skill defaults to returning the Excalidraw link. If upload is unavailable, it returns the local preview SVG and `.excalidraw` paths. For interview-style content, it also prints the copyable talk track.
 
 ## Standalone Skill
 
@@ -327,7 +328,7 @@ The script uses only Python standard library. If Node.js and network access are 
 
 ## Practical Limit
 
-No agent host should auto-enable arbitrary cloned plugins without user trust. So a literal zero-click install after `git clone` is not realistic across Codex, Cursor, and Claude Code. The closest safe, portable target is what this repo implements: once the host imports or installs the plugin, the actual user workflow is copy paragraph in, get preview image plus link out.
+No agent host should auto-enable arbitrary cloned plugins without user trust. So a literal zero-click install after `git clone` is not realistic across Codex, Cursor, and Claude Code. The closest safe, portable target is what this repo implements: once the host imports or installs the plugin, the actual user workflow is copy paragraph in, get preview image, editable link, and talk track out.
 
 ## 中文说明
 

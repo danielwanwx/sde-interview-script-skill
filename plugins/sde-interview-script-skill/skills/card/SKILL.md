@@ -17,8 +17,9 @@ Default chat response:
 
 1. Rendered preview image when the host can display it.
 2. Excalidraw link if upload succeeds; otherwise the `.excalidraw` path.
+3. Copyable interview talk track when the source is interview prep, system design, API design, or technical study material.
 
-Do not paste the script text outside the image unless the user asks for copyable text. For interview prep, if the user asks for the speakable script separately, put that script in chat and keep the board diagram-first.
+When the user pastes a paragraph to test or validate the skill, treat that as a request for a complete output: preview image, editable link/path, and a concise speakable script in chat. Keep the board diagram-first, but do not make the user open the image just to copy the talk track.
 
 ## Diagram-First Rule
 
@@ -247,8 +248,8 @@ If the current working directory is not this skill directory, run the script wit
 
 Host-specific delivery:
 
-- Codex/Cursor: return Markdown image for `preview`, then `link` or `.excalidraw` path.
-- Claude Code or terminal-only hosts: return `link` first; if no link exists, return `preview` and `.excalidraw` paths.
+- Codex/Cursor: return Markdown image for `preview`, then `link` or `.excalidraw` path, then the copyable talk track when present.
+- Claude Code or terminal-only hosts: return `link` first; if no link exists, return `preview` and `.excalidraw` paths; then include the copyable talk track when present.
 
 ## Visual Style
 
