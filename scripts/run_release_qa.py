@@ -500,6 +500,49 @@ def validate_text_wrapping(renderer: Path) -> None:
         raise AssertionError(f"Connector label split a word: {label_block.get('lines')}")
 
 
+def validate_url_fetch_outline() -> None:
+    fetcher_path = ROOT / "scripts/fetch_url_text.py"
+    spec = importlib.util.spec_from_file_location("card_fetcher_for_qa", fetcher_path)
+    if spec is None or spec.loader is None:
+        raise AssertionError(f"Cannot import URL fetcher for QA: {fetcher_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    html_doc = """
+    <html>
+      <body>
+        <nav>Subscribe Sign in</nav>
+        <main>
+          <h1>Caching for System Design Interviews</h1>
+          <p>In system design interviews, caching comes up almost every time high read traffic would otherwise make the database the bottleneck.</p>
+          <h2>Where to Cache</h2>
+          <p>Most systems use a cache between the application and database, but caching can also live in browsers, CDNs, applications, and databases.</p>
+          <h2>CDN (Content Delivery Network)</h2>
+          <p>A CDN keeps public content near users so images and other cacheable responses do not always travel back to the origin server.</p>
+          <h2>Cache Invalidation</h2>
+          <p>Invalidation is the hard part because the system must decide when stale data is acceptable and when correctness requires a fresh read.</p>
+          <h2>Test Your Knowledge</h2>
+          <p>This footer content should be trimmed before outline extraction.</p>
+        </main>
+      </body>
+    </html>
+    """
+    parser = module.ArticleTextParser()
+    parser.feed(html_doc)
+    text, method = parser.best_text(24000)
+    outline, sections = module.build_outline_and_sections(text, parser.structured_blocks)
+    titles = [item["title"] for item in outline]
+    expected = ["Where to Cache", "CDN (Content Delivery Network)", "Cache Invalidation"]
+    if titles != expected:
+        raise AssertionError(f"URL outline extraction drifted: {titles!r}")
+    if method != "html-main":
+        raise AssertionError(f"Unexpected URL extraction method: {method}")
+    if len(sections) != 4:
+        raise AssertionError(f"Expected intro plus 3 titled sections, got {len(sections)}")
+    if any("Test Your Knowledge" in section.get("text", "") for section in sections):
+        raise AssertionError("URL sections include trimmed footer content")
+
+
 def run_release_cases(out_dir: Path, renderer: Path) -> None:
     case_paths = sorted(SMOKE_CASE_DIR.glob("*.json")) + sorted(RELEASE_CASE_DIR.glob("*.json"))
     if not case_paths:
@@ -563,6 +606,7 @@ def main() -> None:
     validate_packaging()
     compile_python()
     validate_text_wrapping(args.renderer)
+    validate_url_fetch_outline()
     run_release_cases(args.out, args.renderer)
     print("RELEASE_QA_PASS")
 

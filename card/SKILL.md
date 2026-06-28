@@ -41,12 +41,45 @@ Turn this link into an Excalidraw card: https://example.com/article
 URL ingestion loop:
 
 1. Run `scripts/fetch_url_text.py` on the URL and read the JSON it emits.
-2. Treat `title`, `description`, and `text` as the source material for the board.
-3. Preserve `source_notes` in the card JSON, including `url`, `final_url`, `title`, `fetched_at`, and `extraction_method`.
+2. Treat `title`, `description`, `outline`, `sections`, and `text` as the source material for the board.
+3. Preserve `source_notes` in the card JSON, including `url`, `final_url`, `title`, `fetched_at`, `extraction_method`, `section_count`, and `outline_titles`.
 4. If extraction fails, returns too little text, hits a paywall, or produces obvious navigation/boilerplate instead of article content, try host browsing tools when available. If that still fails, ask the user to paste the relevant excerpt.
 5. Do not paste the fetched article back into chat. Return the card artifacts and a concise talk track.
 
 For multiple URLs, fetch each URL separately, then build one board only if the pages are clearly about the same topic. If they are unrelated, ask the user which link should be the primary source.
+
+## Source-Heading First
+
+When the source includes article headings, section titles, numbered steps, or clearly named chunks, use those titles as the first choice for page, module, and block titles. This is especially important for URL input: the user should be able to move from the source page to the card without hunting for where a concept went.
+
+Apply this rule before inventing new labels:
+
+1. Read the fetched `outline` and `sections`.
+2. Use source section titles for major modules, page subtitles, and anchor blocks when they are specific enough.
+3. Preserve recognizable terms from the source, then translate naturally if the user asked for another language. For Chinese cards, a source heading such as `Where to Cache` can become `Where to Cache：缓存放在哪里`, not a generic label like `缓存概览`.
+4. If the source has no useful headings, infer 3-6 blocks from the content and use concise explanatory titles.
+5. Only rename a source heading when it is too vague by itself, and keep the original phrase visible in the new title or first block.
+
+Avoid generic module titles such as `Core idea`, `Key points`, `Overview`, or `Tradeoffs` when the source provides better section titles.
+
+## Page Planning
+
+For long articles, web pages, chapters, or sources with many headings, prefer multiple focused cards over one crowded canvas. A page is one renderer input and one preview/link. Multi-page output is the default when any of these are true:
+
+- URL extraction returns 5 or more useful `outline` headings.
+- Extracted text is over roughly 2,400 English words or 3,000 Chinese characters.
+- A single board would need more than 8-10 dense blocks.
+- The source mixes concept explanation, examples, implementation choices, pitfalls, and interview guidance.
+
+Plan pages before writing any card JSON:
+
+1. Build a short `page_plan` from `outline`/`sections`.
+2. Keep each page centered on one reading job: mental model, one source section group, one flow, one comparison, or one failure mode.
+3. Reuse source headings as page titles or module titles where possible.
+4. Keep each page to about 4-7 blocks and 1-3 callouts.
+5. Render each page separately with slugs such as `topic-01-overview`, `topic-02-where-to-cache`, and return every preview/link in order.
+
+The first page may be an overview if it helps orient the reader, but later pages should follow the source's structure instead of reorganizing everything into a new taxonomy. Do not force every page into the same grid. Use `pipeline`, `architecture`, `comparison`, `concept-map`, or manual positions per page based on what that page explains.
 
 ## Diagram-First Rule
 
@@ -145,8 +178,10 @@ Before writing the JSON, mentally produce this content plan:
 Also do a compact pre-drawing planning pass before choosing the final layout:
 
 - Use `single`, `comparison`, `pipeline`, `architecture`, or `concept-map` when the source is one clear idea.
-- Use `modular-composite` when the source has more than five meaningful entities, more than two flows, multiple technical types, or mixes architecture, consistency, scaling, and failure recovery.
+- Use multi-page output before `modular-composite` when a full article has many source headings or would produce a crowded single canvas.
+- Use `modular-composite` when the source is still one coherent page but has more than five meaningful entities, more than two flows, multiple technical types, or mixes architecture, consistency, scaling, and failure recovery.
 - Split complex systems into modules such as overview, read path, write path, consistency boundary, async processing, failure recovery, or operational tradeoffs.
+- For URL input with headings, prefer modules based on the source's own titles before fallback names such as overview/read path/write path.
 - Keep the board content professional, as if drawn by the candidate during the interview. Do not put coaching instructions in module names or blocks.
 
 The visual blocks should contain **design sentence density**, not keyword density. A good board block sounds like this:
@@ -314,6 +349,28 @@ python3 scripts/render_interview_card.py --content /tmp/card.json --out /tmp/car
 ```
 
 If the current working directory is not this skill directory, run the script with its absolute path. Read the JSON emitted by the script; it contains `preview`, `excalidraw`, `link`, and `share`.
+
+For multi-page output, create one compact JSON file per page and render each one separately:
+
+```bash
+python3 scripts/render_interview_card.py --content /tmp/card-page-01.json --out /tmp/card-output --slug card-01
+python3 scripts/render_interview_card.py --content /tmp/card-page-02.json --out /tmp/card-output --slug card-02
+```
+
+Each page JSON should carry the same `source_notes` and include a small page-planning entry such as:
+
+```json
+{
+  "planning": {
+    "page": 2,
+    "page_count": 3,
+    "source_sections": ["Where to Cache", "External Caching", "CDN"],
+    "reason": "These source headings all answer where cache belongs."
+  }
+}
+```
+
+Return all generated previews and links in page order. Keep the chat talk track concise by giving one short combined script or 1-2 lines per page, not a rewritten article.
 
 For spoken rehearsal, use ElevenLabs only when the user asks for audio/read-aloud output or has explicitly requested automatic talk-track audio. Never hardcode API keys in the skill, JSON, or generated files. Read the key from `ELEVENLABS_API_KEY` and run:
 

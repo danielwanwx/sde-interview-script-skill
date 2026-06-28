@@ -53,11 +53,14 @@ BLOCK_TAGS = {
 }
 SKIP_TAGS = {"script", "style", "noscript", "svg", "canvas", "template"}
 CONTAINER_TAGS = {"article", "main"}
+HEADING_TAGS = {f"h{level}": level for level in range(1, 7)}
+TEXT_CAPTURE_TAGS = {"p", "li", "blockquote", "figcaption", "pre"}
 BOILERPLATE_PATTERNS = [
     re.compile(r"^subscribe\b", re.I),
     re.compile(r"^sign in\b", re.I),
     re.compile(r"^log in\b", re.I),
     re.compile(r"^share\b", re.I),
+    re.compile(r"^watch now$", re.I),
     re.compile(r"^copyright\b", re.I),
     re.compile(r"^all rights reserved\b", re.I),
 ]
@@ -160,6 +163,8 @@ def trim_to_article_text(text: str) -> str:
         looks_like_paragraph = len(line) >= 90 and bool(re.search(r"[.!?。！？]$", line))
         if looks_like_paragraph:
             start = index
+            while start > 0 and looks_like_heading(lines[start - 1]):
+                start -= 1
             break
 
     end = len(lines)
@@ -179,7 +184,9 @@ class ArticleTextParser(HTMLParser):
         self.skip_depth = 0
         self.body_depth = 0
         self.container_stack: list[dict[str, Any]] = []
+        self.capture_stack: list[dict[str, Any]] = []
         self.candidates: list[dict[str, str]] = []
+        self.structured_blocks: list[dict[str, Any]] = []
         self.body_parts: list[str] = []
         self.title_parts: list[str] = []
         self.meta: dict[str, str] = {}
@@ -205,6 +212,15 @@ class ArticleTextParser(HTMLParser):
             return
         if self._is_content_container(tag, attr_map):
             self.container_stack.append({"tag": tag, "parts": []})
+        if self.body_depth and self._should_capture_tag(tag):
+            self.capture_stack.append(
+                {
+                    "tag": tag,
+                    "kind": "heading" if tag in HEADING_TAGS else "text",
+                    "level": HEADING_TAGS.get(tag),
+                    "parts": [],
+                },
+            )
         if tag in BLOCK_TAGS:
             self._append("\n")
 
@@ -221,6 +237,8 @@ class ArticleTextParser(HTMLParser):
             return
         if tag in BLOCK_TAGS:
             self._append("\n")
+        if self.capture_stack and self.capture_stack[-1]["tag"] == tag:
+            self._finish_capture()
         if tag == "body" and self.body_depth:
             self.body_depth -= 1
         if self.container_stack and self.container_stack[-1]["tag"] == tag:
@@ -243,6 +261,8 @@ class ArticleTextParser(HTMLParser):
         self.body_parts.append(value)
         for candidate in self.container_stack:
             candidate["parts"].append(value)
+        for capture in self.capture_stack:
+            capture["parts"].append(value)
 
     def _handle_meta(self, attrs: dict[str, str]) -> None:
         key = attrs.get("property") or attrs.get("name")
@@ -261,6 +281,28 @@ class ArticleTextParser(HTMLParser):
         if any(token in class_text for token in ["article", "post-content", "markdown", "prose"]):
             return True
         return False
+
+    def _should_capture_tag(self, tag: str) -> bool:
+        if tag in HEADING_TAGS:
+            return True
+        if tag not in TEXT_CAPTURE_TAGS:
+            return False
+        # Avoid duplicate paragraph events when a list item wraps its content in <p>.
+        return not any(capture["tag"] in TEXT_CAPTURE_TAGS for capture in self.capture_stack)
+
+    def _finish_capture(self) -> None:
+        capture = self.capture_stack.pop()
+        text = normalize_inline_text("".join(capture["parts"]))
+        if not text or any(pattern.search(text) for pattern in BOILERPLATE_PATTERNS):
+            return
+        block: dict[str, Any] = {
+            "kind": capture["kind"],
+            "text": text,
+        }
+        if capture["level"]:
+            block["level"] = capture["level"]
+        if not self.structured_blocks or self.structured_blocks[-1] != block:
+            self.structured_blocks.append(block)
 
     def best_text(self, max_chars: int) -> tuple[str, str]:
         body_text = normalize_text("".join(self.body_parts))
@@ -289,6 +331,208 @@ class ArticleTextParser(HTMLParser):
         return None
 
 
+def normalize_inline_text(text: str) -> str:
+    text = html.unescape(text).replace("\u00a0", " ")
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
+
+
+def normalize_for_match(text: str) -> str:
+    return normalize_inline_text(text).lower()
+
+
+def looks_like_heading(line: str) -> bool:
+    line = normalize_inline_text(line)
+    if not 3 <= len(line) <= 96:
+        return False
+    if len(line.split()) > 12:
+        return False
+    if re.search(r"[.!?。！？]$", line):
+        return False
+    if re.search(r"^(http|www\.|copyright|subscribe|sign in|log in|watch now)\b", line, re.I):
+        return False
+    if re.match(r"^[A-Z][A-Z0-9 _/-]{5,}$", line):
+        return True
+    title_tokens = sum(1 for token in re.findall(r"[A-Za-z][A-Za-z0-9+-]*", line) if token[:1].isupper())
+    if title_tokens >= max(1, len(re.findall(r"[A-Za-z][A-Za-z0-9+-]*", line)) // 2):
+        return True
+    return bool(re.search(r"[\u4e00-\u9fff]", line) and len(line) <= 40)
+
+
+def text_appears_in_article(text: str, article_text: str, article_match: str) -> bool:
+    normalized = normalize_for_match(text)
+    if not normalized:
+        return False
+    if normalized in article_match:
+        return True
+    # Some HTML parsers collapse punctuation or spacing differently; matching a
+    # meaningful prefix keeps source-outline recovery tolerant without admitting nav.
+    return len(normalized) >= 48 and normalized[:48] in article_match
+
+
+def article_line_events(article_text: str, source_events: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    article_match = normalize_for_match(article_text)
+    source_heading_by_title: dict[str, dict[str, Any]] = {}
+    for event in source_events:
+        if event.get("kind") != "heading":
+            continue
+        text = normalize_inline_text(str(event.get("text") or ""))
+        if not text_appears_in_article(text, article_text, article_match):
+            continue
+        source_heading_by_title[normalize_for_match(text)] = event
+    source_has_section_headings = any(int(event.get("level") or 2) > 1 for event in source_heading_by_title.values())
+
+    lines = [normalize_inline_text(raw_line) for raw_line in article_text.splitlines()]
+    lines = [line for line in lines if line]
+
+    def has_following_body(index: int) -> bool:
+        for next_line in lines[index + 1 : index + 5]:
+            next_heading = source_heading_by_title.get(normalize_for_match(next_line))
+            if next_heading:
+                return False
+            if len(next_line) >= 80 and bool(re.search(r"[.!?。！？]$", next_line)):
+                return True
+            if not looks_like_heading(next_line):
+                return True
+        return False
+
+    events: list[dict[str, Any]] = []
+    for index, line in enumerate(lines):
+        heading_event = source_heading_by_title.get(normalize_for_match(line))
+        heading_level = int(heading_event.get("level") or 2) if heading_event else None
+        if heading_event and source_has_section_headings and heading_level == 1:
+            events.append({"kind": "text", "text": line, "inferred": True})
+        elif heading_event and has_following_body(index):
+            events.append(
+                {
+                    "kind": "heading",
+                    "level": int(heading_event.get("level") or 2),
+                    "text": line,
+                    "inferred": False,
+                },
+            )
+        elif not source_heading_by_title and looks_like_heading(line):
+            events.append({"kind": "heading", "level": 3, "text": line, "inferred": True})
+        else:
+            events.append({"kind": "text", "text": line, "inferred": True})
+    return events
+
+
+def filtered_source_events(article_text: str, events: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    line_events = article_line_events(article_text, events)
+    filtered: list[dict[str, Any]] = []
+    previous_key: tuple[Any, ...] | None = None
+    for event in line_events:
+        text = normalize_inline_text(str(event.get("text") or ""))
+        normalized_event = dict(event)
+        normalized_event["text"] = text
+        key = (normalized_event.get("kind"), normalized_event.get("level"), normalize_for_match(text))
+        if key == previous_key:
+            continue
+        filtered.append(normalized_event)
+        previous_key = key
+    return filtered
+
+
+def chunk_untitled_sections(article_text: str, target_chars: int = 1400) -> list[dict[str, Any]]:
+    paragraphs = [normalize_inline_text(part) for part in re.split(r"\n{2,}", article_text) if normalize_inline_text(part)]
+    sections: list[dict[str, Any]] = []
+    current_parts: list[str] = []
+    current_len = 0
+    for paragraph in paragraphs:
+        if current_parts and current_len + len(paragraph) > target_chars:
+            text = "\n\n".join(current_parts)
+            sections.append(
+                {
+                    "index": len(sections) + 1,
+                    "title": None,
+                    "level": None,
+                    "text": text,
+                    "char_count": len(text),
+                    "source_title": False,
+                },
+            )
+            current_parts = []
+            current_len = 0
+        current_parts.append(paragraph)
+        current_len += len(paragraph)
+    if current_parts:
+        text = "\n\n".join(current_parts)
+        sections.append(
+            {
+                "index": len(sections) + 1,
+                "title": None,
+                "level": None,
+                "text": text,
+                "char_count": len(text),
+                "source_title": False,
+            },
+        )
+    return sections
+
+
+def build_outline_and_sections(article_text: str, events: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    source_events = filtered_source_events(article_text, events)
+    sections: list[dict[str, Any]] = []
+    current: dict[str, Any] | None = None
+
+    def flush_current() -> None:
+        nonlocal current
+        if not current:
+            return
+        text = "\n\n".join(current.pop("_parts", [])).strip()
+        current["text"] = text
+        current["char_count"] = len(text)
+        if current["title"] or text:
+            current["index"] = len(sections) + 1
+            sections.append(current)
+        current = None
+
+    for event in source_events:
+        kind = event.get("kind")
+        text = normalize_inline_text(str(event.get("text") or ""))
+        if not text:
+            continue
+        if kind == "heading":
+            if current and current.get("title") and normalize_for_match(str(current["title"])) == normalize_for_match(text):
+                continue
+            flush_current()
+            current = {
+                "title": text,
+                "level": int(event.get("level") or 2),
+                "source_title": not bool(event.get("inferred")),
+                "_parts": [],
+            }
+            continue
+        if current is None:
+            current = {
+                "title": None,
+                "level": None,
+                "source_title": False,
+                "_parts": [],
+            }
+        current["_parts"].append(text)
+    flush_current()
+
+    titled_sections = [section for section in sections if section.get("title")]
+    if not titled_sections:
+        sections = chunk_untitled_sections(article_text)
+        titled_sections = []
+
+    outline = [
+        {
+            "index": section["index"],
+            "title": section["title"],
+            "level": section.get("level"),
+            "source_title": bool(section.get("source_title")),
+            "char_count": section.get("char_count", 0),
+        }
+        for section in sections
+        if section.get("title")
+    ]
+    return outline, sections
+
+
 def extract(url: str, timeout: float, max_bytes: int, max_chars: int, min_chars: int) -> dict[str, Any]:
     html_text, final_url, content_type = fetch_html(url, timeout, max_bytes)
     parser = ArticleTextParser()
@@ -300,6 +544,7 @@ def extract(url: str, timeout: float, max_bytes: int, max_chars: int, min_chars:
         )
     fetched_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     title = parser.title()
+    outline, sections = build_outline_and_sections(text, parser.structured_blocks)
     result = {
         "url": url,
         "final_url": final_url,
@@ -307,6 +552,8 @@ def extract(url: str, timeout: float, max_bytes: int, max_chars: int, min_chars:
         "description": parser.description(),
         "content_type": content_type,
         "text": text,
+        "outline": outline,
+        "sections": sections,
         "char_count": len(text),
         "word_count": len(re.findall(r"\w+", text, flags=re.UNICODE)),
         "fetched_at": fetched_at,
@@ -318,6 +565,8 @@ def extract(url: str, timeout: float, max_bytes: int, max_chars: int, min_chars:
             "fetched_at": fetched_at,
             "extraction_method": method,
             "content_char_count": len(text),
+            "section_count": len(sections),
+            "outline_titles": [item["title"] for item in outline],
             "completion_mode": "researched",
         },
     }

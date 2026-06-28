@@ -85,7 +85,9 @@ The content step is intentionally LLM-heavy: the agent should first infer what a
 
 The agent should also do an automatic source-sufficiency check. If the pasted text is already complete, it should only condense and structure it. If the text is partial or thin, it should fill the missing stable background needed for a useful board and talk track, such as mechanisms, tradeoffs, examples, caveats, or production implications. Browsing is reserved for current, version-specific, product-specific, niche, or high-stakes facts; when browsing is used, prefer primary or authoritative sources. The JSON can include `source_notes` with `completeness`, `completion_mode`, `added_points`, and `uncertain_points`, but those notes are not rendered by default.
 
-Before drawing, the agent should do a compact pre-drawing plan. For short material, a single comparison, pipeline, concept map, or architecture board is usually enough. For larger system-design material, use `layout: "modular-composite"` and split the board into modules. Good signals for modular mode include: more than five meaningful entities, more than two flows, multiple technical types (API, storage, cache, queue, consistency, failure recovery), or a source paragraph that mixes requirements, architecture, tradeoffs, and failure modes.
+Before drawing, the agent should do a compact pre-drawing plan. For short material, a single comparison, pipeline, concept map, or architecture board is usually enough. For URL input and longer articles, the fetcher emits `outline` and `sections`; page, module, and block titles should follow those source headings whenever they are specific enough. This makes the rendered card easy to map back to the original article.
+
+For long pages, prefer multiple focused cards over one crowded canvas. Multi-page output is the default when extraction returns five or more useful headings, the article is longer than roughly 2,400 English words or 3,000 Chinese characters, or one board would need more than 8-10 dense blocks. Each page gets its own JSON, preview, and Excalidraw link. Use `layout: "modular-composite"` only when the material still belongs on one coherent page but needs coordinated modules. Good signals for modular mode include: more than five meaningful entities, more than two flows, multiple technical types (API, storage, cache, queue, consistency, failure recovery), or a source paragraph that mixes requirements, architecture, tradeoffs, and failure modes.
 
 The planning shape can be embedded in the JSON so another host can understand the intent:
 
@@ -111,7 +113,7 @@ The planning shape can be embedded in the JSON so another host can understand th
 }
 ```
 
-Blocks can then set `"module": "booking"` or any matching module id. The renderer draws dashed module frames and keeps arrows routed around unrelated blocks.
+Blocks can then set `"module": "booking"` or any matching module id. For URL-derived cards, use source headings as module titles before inventing fallback names like `overview` or `tradeoffs`. The renderer draws dashed module frames and keeps arrows routed around unrelated blocks.
 
 The renderer follows the Excalidraw+ docs model as closely as possible while staying offline-compatible: scenes are built from native Excalidraw blocks and connector elements, with semantic metadata for blocks, labels, and arrows. The local renderer does not require the Excalidraw+ MCP, but the same JSON structure can be adapted to MCP `edit_scene_content` flows when a host exposes that tool.
 
@@ -176,10 +178,11 @@ scripts/                                             # repo-level renderer test 
 After the plugin or skill is installed in a host:
 
 1. User pastes a Hello Interview/API/system-design paragraph.
-2. Or the user provides a public article URL; the skill first runs `scripts/fetch_url_text.py` and uses the extracted text as source material.
+2. Or the user provides a public article URL; the skill first runs `scripts/fetch_url_text.py` and uses the extracted `title`, `outline`, `sections`, and `text` as source material.
 3. User optionally specifies language, for example `in Chinese`, `用中文`, `in Spanish`, or `bilingual English and Chinese`. If no language is specified, the skill uses English.
 4. The agent invokes `card` by default, or `senior-sde-interview-script` for the explicit SDE preset.
-5. The skill tells the agent to create a diagram JSON object:
+5. For long URL sources, the agent creates a short page plan first and renders one compact card JSON per page. Each page preview/link is returned in source order.
+6. The skill tells the agent to create a diagram JSON object:
 
 ```json
 {
