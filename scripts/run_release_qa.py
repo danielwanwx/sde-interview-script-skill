@@ -160,9 +160,15 @@ REQUIRED_PATHS = [
     "plugins/sde-interview-script-skill/commands/card.md",
     "plugins/sde-interview-script-skill/skills/card/SKILL.md",
     "plugins/sde-interview-script-skill/skills/senior-sde-interview-script/SKILL.md",
+    "scripts/fetch_url_text.py",
     "scripts/render_interview_card.py",
     "scripts/run_hello_interview_visual_smoke.py",
     "scripts/share_excalidraw.mjs",
+]
+
+URL_FETCH_COPIES = [
+    "card/scripts/fetch_url_text.py",
+    "plugins/sde-interview-script-skill/skills/card/scripts/fetch_url_text.py",
 ]
 
 RENDERER_COPIES = [
@@ -444,13 +450,21 @@ def validate_packaging() -> None:
         if copy_path.read_bytes() != canonical:
             raise AssertionError(f"Renderer copy is out of sync: {copy_text}")
 
+    canonical_fetch = (ROOT / "scripts/fetch_url_text.py").read_bytes()
+    for copy_text in URL_FETCH_COPIES:
+        copy_path = ROOT / copy_text
+        if copy_path.read_bytes() != canonical_fetch:
+            raise AssertionError(f"URL fetcher copy is out of sync: {copy_text}")
+
 
 def compile_python() -> None:
     paths = [
         ROOT / "scripts/render_interview_card.py",
+        ROOT / "scripts/fetch_url_text.py",
         ROOT / "scripts/run_hello_interview_visual_smoke.py",
         ROOT / "scripts/run_release_qa.py",
         *(ROOT / copy for copy in RENDERER_COPIES),
+        *(ROOT / copy for copy in URL_FETCH_COPIES),
     ]
     env = dict(os.environ)
     env.setdefault("PYTHONPYCACHEPREFIX", "/tmp/sde-skill-pycache")

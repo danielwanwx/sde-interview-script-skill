@@ -28,6 +28,26 @@ Default chat response:
 
 When the user pastes a paragraph to test or validate the skill, treat that as a request for a complete output: preview image, editable link/path, and a concise speakable script in chat. Keep the board diagram-first, but do not make the user open the image just to copy the talk track.
 
+## URL Input
+
+If the user's primary source is one or more `http://` or `https://` URLs, fetch the page content first instead of asking the user to paste the article. Use URL ingestion for prompts such as:
+
+```text
+Use $card in Chinese: https://example.com/article
+/card chinese https://example.com/article
+Turn this link into an Excalidraw card: https://example.com/article
+```
+
+URL ingestion loop:
+
+1. Run `scripts/fetch_url_text.py` on the URL and read the JSON it emits.
+2. Treat `title`, `description`, and `text` as the source material for the board.
+3. Preserve `source_notes` in the card JSON, including `url`, `final_url`, `title`, `fetched_at`, and `extraction_method`.
+4. If extraction fails, returns too little text, hits a paywall, or produces obvious navigation/boilerplate instead of article content, try host browsing tools when available. If that still fails, ask the user to paste the relevant excerpt.
+5. Do not paste the fetched article back into chat. Return the card artifacts and a concise talk track.
+
+For multiple URLs, fetch each URL separately, then build one board only if the pages are clearly about the same topic. If they are unrelated, ask the user which link should be the primary source.
+
 ## Diagram-First Rule
 
 Avoid the old pattern of `summary + long script + four boxes + short version`. That feels like moving an article into a card.
@@ -278,6 +298,14 @@ For `modular-composite`, include `planning.modules` or top-level `modules`, then
 - Do not use a Chinese translation just because one exists if it makes the sentence less clear.
 
 ## Rendering
+
+For URL-only requests, fetch the source before writing the card JSON:
+
+```bash
+python3 scripts/fetch_url_text.py "https://example.com/article" --out /tmp/card-source.json
+```
+
+Then read `/tmp/card-source.json`, create the normal compact card JSON from the extracted `text`, and copy its `source_notes` into the card JSON. If the script exits non-zero, follow the URL ingestion fallback rules above.
 
 Use the bundled renderer first:
 

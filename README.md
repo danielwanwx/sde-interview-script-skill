@@ -52,6 +52,12 @@ Chinese:
 Use $card in Chinese: <paste text here>
 ```
 
+URL input:
+
+```text
+Use $card in Chinese: https://www.hellointerview.com/learn/system-design/core-concepts/caching
+```
+
 Claude Code:
 
 ```text
@@ -170,9 +176,10 @@ scripts/                                             # repo-level renderer test 
 After the plugin or skill is installed in a host:
 
 1. User pastes a Hello Interview/API/system-design paragraph.
-2. User optionally specifies language, for example `in Chinese`, `用中文`, `in Spanish`, or `bilingual English and Chinese`. If no language is specified, the skill uses English.
-3. The agent invokes `card` by default, or `senior-sde-interview-script` for the explicit SDE preset.
-4. The skill tells the agent to create a diagram JSON object:
+2. Or the user provides a public article URL; the skill first runs `scripts/fetch_url_text.py` and uses the extracted text as source material.
+3. User optionally specifies language, for example `in Chinese`, `用中文`, `in Spanish`, or `bilingual English and Chinese`. If no language is specified, the skill uses English.
+4. The agent invokes `card` by default, or `senior-sde-interview-script` for the explicit SDE preset.
+5. The skill tells the agent to create a diagram JSON object:
 
 ```json
 {
@@ -217,7 +224,7 @@ After the plugin or skill is installed in a host:
 }
 ```
 
-5. The agent runs the bundled renderer:
+6. The agent runs the bundled renderer:
 
 ```bash
 python3 scripts/render_interview_card.py \
@@ -226,7 +233,7 @@ python3 scripts/render_interview_card.py \
   --slug interview-card
 ```
 
-6. The renderer writes:
+7. The renderer writes:
 
 ```json
 {
@@ -236,7 +243,7 @@ python3 scripts/render_interview_card.py \
 }
 ```
 
-7. Codex/Cursor reply with the preview image, link/path, and copyable talk track. Claude Code terminal replies with the link first, then local paths if needed, then the talk track.
+8. Codex/Cursor reply with the preview image, link/path, and copyable talk track. Claude Code terminal replies with the link first, then local paths if needed, then the talk track.
 
 ## Language Selection
 
