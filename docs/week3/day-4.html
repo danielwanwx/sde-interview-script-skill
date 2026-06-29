@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>第 3 周第 4 天 - Top K 与近似统计</title><link rel="stylesheet" href="../week1/style.css"></head>
+<body>
+  <header class="topbar"><nav class="shell nav"><a class="brand" href="../week3-action-guide.html"><span class="mark"></span> 第 3 周</a><div class="navlinks"><a href="day-3.html">上一天</a><a href="day-5.html">下一天</a><a href="scorecard.html">评分表</a></div></nav></header>
+  <main class="shell">
+    <section class="day-hero"><div class="eyebrow">第 3 周 · 第 4 天 · 2026-07-16 周四 · Scale</div><h1>Top K 与近似统计</h1><p class="deck">产出 Top K 方案：精确版、近似版、误差说明、刷新频率、回填路径。</p><div class="day-meta"><span>系统设计 105 分钟</span><span>算法 75 分钟</span><span>复盘 10 分钟</span></div></section>
+    <div class="ops-grid">
+      <section><h2>学习源包</h2>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/problem-breakdowns/top-k">YouTube Top K</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Counting</li><li>Heavy Hitters</li><li>Approximation</li></ul>
+          <div class="proof">验收：能从 exact counting 过渡到 approximate heavy hitters。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/deep-dives/data-structures-for-big-data">Data Structures for Big Data</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Bloom Filters</li><li>Count-Min Sketch</li><li>HyperLogLog</li></ul>
+          <div class="proof">验收：能说 Bloom Filter、Count-Min Sketch、HyperLogLog 的误差边界。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://ddia.vonng.com/ch11/">第十一章：批处理</a><span>DDIA</span></div>
+          <ul class="source-sections"><li>MapReduce</li><li>物化视图</li><li>Join</li></ul>
+          <div class="proof">验收：知道 batch backfill 与在线聚合的区别。</div>
+        </div><div class="extension-block"><div class="mini-title">拓展阅读</div><ul class="extension-list"><li><a href="https://www.designgurus.io/course/grokking-the-system-design-interview">Grokking the System Design Interview</a>：对照 Grokking 的同类 case study。</li><li><a href="https://bytebytego.com/">ByteByteGo System Design</a>：用 Alex Xu / ByteByteGo 图解校准表达。</li></ul></div></section>
+      <section><h2>今日验收</h2><table class="rubric"><tr><th>产出物</th><td>产出 Top K 方案：精确版、近似版、误差说明、刷新频率、回填路径。</td></tr><tr><th>必须掌握</th><td>能比较 heap、partitioned counters、Count-Min Sketch 的成本。</td></tr><tr><th>修复规则</th><td>如果没有误差和延迟说明，不能算通过。</td></tr></table><h2 style="margin-top:28px">算法模块</h2><div class="algo-pack"><div class="tag-row"><span>NeetCode Tag：Stack</span><span>单调栈</span></div><p class="algo-why">继续 Stack，进入单调栈。</p><p class="algo-line"><a href="https://leetcode.com/problems/daily-temperatures/">必做：Daily Temperatures</a><a href="https://leetcode.com/problems/car-fleet/">必做：Car Fleet</a><a href="https://leetcode.com/problems/evaluate-reverse-polish-notation/">复盘：Evaluate RPN</a></p><div class="mini-title">选做热门题</div><p class="algo-line"><a href="https://leetcode.com/problems/remove-all-adjacent-duplicates-in-string/">选做：Remove Adjacent Duplicates</a><a href="https://leetcode.com/problems/online-stock-span/">选做：Online Stock Span</a><a href="https://leetcode.com/problems/next-greater-element-ii/">选做：Next Greater Element II</a></p></div></section>
+    </div>
+    <footer class="footer">第 3 周第 4 天通过条件：产出物可口述，算法题位有记录，最低信心点已写入 repair。</footer>
+  </main>
+</body>
+</html>

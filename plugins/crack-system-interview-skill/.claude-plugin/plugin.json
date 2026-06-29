@@ -1,0 +1,22 @@
+{
+  "name": "crack-system-interview-skill",
+  "version": "0.5.0",
+  "description": "System design interview prep skills: diagram-first Excalidraw cards, senior SDE talk tracks, and a 14-week study coach.",
+  "author": {
+    "name": "Daniel Wan",
+    "url": "https://github.com/danielwanwx"
+  },
+  "homepage": "https://github.com/danielwanwx/crack-system-interview-skill",
+  "repository": "https://github.com/danielwanwx/crack-system-interview-skill",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "skill",
+    "plugin",
+    "interview",
+    "system-design",
+    "excalidraw"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
+}

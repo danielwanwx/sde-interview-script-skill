@@ -1,0 +1,43 @@
+{
+  "name": "crack-system-interview-skill",
+  "version": "0.5.0",
+  "description": "System design interview prep skills: diagram-first Excalidraw cards, senior SDE talk tracks, and a 14-week study coach.",
+  "author": {
+    "name": "Daniel Wan",
+    "url": "https://github.com/danielwanwx"
+  },
+  "homepage": "https://github.com/danielwanwx/crack-system-interview-skill",
+  "repository": "https://github.com/danielwanwx/crack-system-interview-skill",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "skill",
+    "plugin",
+    "interview",
+    "system-design",
+    "excalidraw"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Crack System Interview",
+    "shortDescription": "Whiteboard cards and a 14-week study coach.",
+    "longDescription": "Prepare for system design interviews with diagram-first Excalidraw visuals, senior SDE talk tracks, and a bundled 14-week study coach. Use $card for technical notes, $senior-sde-interview-script for interview-ready answers, and $system-design-study-coach for daily assignments and repair tasks.",
+    "developerName": "Daniel Wan",
+    "category": "Productivity",
+    "capabilities": [
+      "Multilingual",
+      "Excalidraw",
+      "Interview Prep",
+      "Study Notes",
+      "Diagramming",
+      "Study Coach"
+    ],
+    "defaultPrompt": [
+      "Use $card to turn this text into a diagram-first Excalidraw visual and link only.",
+      "Use $card in Chinese.",
+      "Use $system-design-study-coach for Week 8 Day 4."
+    ],
+    "brandColor": "#2563EB"
+  },
+  "mcpServers": "./.mcp.json"
+}

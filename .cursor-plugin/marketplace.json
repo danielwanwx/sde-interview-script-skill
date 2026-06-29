@@ -1,16 +1,16 @@
 {
-  "name": "sde-interview-script-skill",
+  "name": "crack-system-interview-skill",
   "owner": {
     "name": "Daniel Wan"
   },
   "metadata": {
-    "description": "Diagram-first script cards rendered as Excalidraw-style visuals with preview images and editable links."
+    "description": "System design interview prep skills with Excalidraw-style cards, senior talk tracks, and a 14-week study coach."
   },
   "plugins": [
     {
-      "name": "sde-interview-script-skill",
-      "source": "plugins/sde-interview-script-skill",
-      "description": "Turn pasted text into diagram-first language-selectable Excalidraw visuals."
+      "name": "crack-system-interview-skill",
+      "source": "plugins/crack-system-interview-skill",
+      "description": "Turn pasted text into diagram-first Excalidraw visuals, or supervise the bundled 14-week system design plan."
     }
   ]
 }

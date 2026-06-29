@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>第 4 周第 5 天 - Presence 与在线状态</title><link rel="stylesheet" href="../week1/style.css"></head>
+<body>
+  <header class="topbar"><nav class="shell nav"><a class="brand" href="../week4-action-guide.html"><span class="mark"></span> 第 4 周</a><div class="navlinks"><a href="day-4.html">上一天</a><a href="day-6.html">下一天</a><a href="scorecard.html">评分表</a></div></nav></header>
+  <main class="shell">
+    <section class="day-hero"><div class="eyebrow">第 4 周 · 第 5 天 · 2026-07-24 周五 · Deep Dive</div><h1>Presence 与在线状态</h1><p class="deck">产出 Presence 方案：heartbeat、TTL、multi-device、fanout、故障恢复。</p><div class="day-meta"><span>系统设计 110 分钟</span><span>算法 75 分钟</span><span>复盘 10 分钟</span></div></section>
+    <div class="ops-grid">
+      <section><h2>学习源包</h2>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/deep-dives/realtime-updates">Real-time Updates</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>WebSockets</li><li>Presence</li><li>Fanout</li></ul>
+          <div class="proof">验收：能设计 presence heartbeat 和 TTL。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/deep-dives/redis">Redis</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Data Structures</li><li>Expiration</li><li>Replication</li></ul>
+          <div class="proof">验收：能用 Redis set/zset/TTL 表达在线状态。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://ddia.vonng.com/ch6/">第六章：复制</a><span>DDIA</span></div>
+          <ul class="source-sections"><li>主从复制</li><li>复制延迟</li><li>多主复制</li></ul>
+          <div class="proof">验收：能解释 replica lag 导致的在线状态误判。</div>
+        </div><div class="extension-block"><div class="mini-title">拓展阅读</div><ul class="extension-list"><li><a href="https://www.designgurus.io/course/grokking-the-system-design-interview">Grokking the System Design Interview</a>：对照 Grokking 的同类 case study。</li><li><a href="https://bytebytego.com/">ByteByteGo System Design</a>：用 Alex Xu / ByteByteGo 图解校准表达。</li></ul></div></section>
+      <section><h2>今日验收</h2><table class="rubric"><tr><th>产出物</th><td>产出 Presence 方案：heartbeat、TTL、multi-device、fanout、故障恢复。</td></tr><tr><th>必须掌握</th><td>必须说清在线状态是近似值，不是强一致事实。</td></tr><tr><th>修复规则</th><td>如果把 presence 当 DB 字段，改成 TTL 状态和事件流。</td></tr></table><h2 style="margin-top:28px">算法模块</h2><div class="algo-pack"><div class="tag-row"><span>NeetCode Tag：Sliding Window</span><span>单调队列</span></div><p class="algo-why">继续 Sliding Window，进入单调队列。</p><p class="algo-line"><a href="https://leetcode.com/problems/sliding-window-maximum/">必做：Sliding Window Maximum</a><a href="https://leetcode.com/problems/max-consecutive-ones-iii/">必做：Max Consecutive Ones III</a><a href="https://leetcode.com/problems/minimum-window-substring/">必做：复盘</a></p><div class="mini-title">选做热门题</div><p class="algo-line"><a href="https://leetcode.com/problems/repeated-dna-sequences/">选做：Repeated DNA Sequences</a><a href="https://leetcode.com/problems/subarrays-with-k-different-integers/">选做：Subarrays with K Different Integers</a><a href="https://leetcode.com/problems/number-of-substrings-containing-all-three-characters/">选做：Number of Substrings</a></p></div></section>
+    </div>
+    <footer class="footer">第 4 周第 5 天通过条件：产出物可口述，算法题位有记录，最低信心点已写入 repair。</footer>
+  </main>
+</body>
+</html>

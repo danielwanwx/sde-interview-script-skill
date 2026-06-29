@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>第 5 周第 1 天 - 大文件上传路径</title><link rel="stylesheet" href="../week1/style.css"></head>
+<body>
+  <header class="topbar"><nav class="shell nav"><a class="brand" href="../week5-action-guide.html"><span class="mark"></span> 第 5 周</a><div class="navlinks"><a href="../week5-action-guide.html">周概览</a><a href="day-2.html">下一天</a><a href="scorecard.html">评分表</a></div></nav></header>
+  <main class="shell">
+    <section class="day-hero"><div class="eyebrow">第 5 周 · 第 1 天 · 2026-07-27 周一 · Foundation</div><h1>大文件上传路径</h1><p class="deck">画大文件上传：init upload、pre-signed URL、multipart、complete、metadata commit。</p><div class="day-meta"><span>系统设计 95 分钟</span><span>算法 75 分钟</span><span>复盘 10 分钟</span></div></section>
+    <div class="ops-grid">
+      <section><h2>学习源包</h2>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/patterns/large-blobs">Handling Large Blobs</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Object Storage</li><li>Multipart Uploads</li><li>CDN</li></ul>
+          <div class="proof">验收：能解释 direct upload、multipart、object storage。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/core-concepts/networking-essentials">Networking Essentials</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Example: A Simple Web Request</li><li>HTTP/HTTPS: The Web&#x27;s Foundation</li></ul>
+          <div class="proof">验收：能说明上传路径里的超时和重试。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/core-concepts/api-design">API Design</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>REST / Resource Modeling</li><li>HTTP Methods</li><li>Security Considerations</li></ul>
+          <div class="proof">验收：能设计 init/complete upload API。</div>
+        </div><div class="extension-block"><div class="mini-title">拓展阅读</div><ul class="extension-list"><li><a href="https://www.designgurus.io/course/grokking-the-system-design-interview">Grokking the System Design Interview</a>：对照 Grokking 的同类 case study。</li><li><a href="https://bytebytego.com/">ByteByteGo System Design</a>：用 Alex Xu / ByteByteGo 图解校准表达。</li></ul></div></section>
+      <section><h2>今日验收</h2><table class="rubric"><tr><th>产出物</th><td>画大文件上传：init upload、pre-signed URL、multipart、complete、metadata commit。</td></tr><tr><th>必须掌握</th><td>必须说清二进制不经过应用服务器的原因。</td></tr><tr><th>修复规则</th><td>如果上传路径穿过 app server，重画对象存储直传。</td></tr></table><h2 style="margin-top:28px">算法模块</h2><div class="algo-pack"><div class="tag-row"><span>NeetCode Tag：Binary Search</span><span>基础边界</span></div><p class="algo-why">本周按 NeetCode 的 Binary Search block 推进。今天只处理「基础边界」，三题都要留下 pattern、invariant、复杂度和错因。</p><p class="algo-line"><a href="https://leetcode.com/problems/binary-search/">必做：Binary Search</a><a href="https://leetcode.com/problems/search-insert-position/">必做：Search Insert Position</a><a href="https://leetcode.com/problems/first-bad-version/">必做：First Bad Version</a></p><div class="mini-title">选做热门题</div><p class="algo-line"><a href="https://leetcode.com/problems/guess-number-higher-or-lower/">选做：Guess Number</a><a href="https://leetcode.com/problems/sqrtx/">选做：Sqrt(x)</a><a href="https://leetcode.com/problems/valid-perfect-square/">选做：Valid Perfect Square</a></p></div></section>
+    </div>
+    <footer class="footer">第 5 周第 1 天通过条件：产出物可口述，算法题位有记录，最低信心点已写入 repair。</footer>
+  </main>
+</body>
+</html>

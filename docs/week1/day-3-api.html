@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>第 3 天 - API 契约</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar"><nav class="shell nav"><a class="brand" href="../week1-action-guide.html"><span class="mark"></span> 第 1 周</a><div class="navlinks"><a href="day-2-requirements.html">上一天</a><a href="day-4-data-model.html">下一天</a><a href="scorecard.html">评分表</a></div></nav></header>
+  <main class="shell">
+    <section class="day-hero">
+      <div class="eyebrow">第 3 天 · 2026-07-01 周三 · 接口纪律</div>
+      <h1>先定义契约，再画盒子</h1>
+      <p class="deck">API 是检验需求是否真实的第一关。今天要把用户可见契约、跳转语义、错误码与重试边界定清楚。</p>
+      <div class="day-meta"><span>系统设计 95 分钟</span><span>算法 80 分钟</span><span>复盘 10 分钟</span></div>
+    </section>
+    <div class="ops-grid">
+      <section>
+        <h2>学习源包</h2>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/core-concepts/api-design">API Design</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>API Types</li><li>REST / Resource Modeling</li><li>HTTP Methods</li><li>Passing Data To APIs</li><li>Returning Data</li><li>Pagination / Versioning Strategies / Security Considerations</li></ul>
+          <div class="proof">验收：REST 作为默认选择；能说明路径、查询参数、请求体各自放什么，以及幂等性边界。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/problem-breakdowns/bitly">Bitly</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>The API</li><li>2) Users should be able to access the original URL by using the shortened URL</li></ul>
+          <div class="proof">验收：能写出 POST /urls、GET /{short_code}、302 跳转、410 过期链接。</div>
+        </div>
+        <div class="extension-block">
+          <div class="mini-title">拓展阅读</div>
+          <ul class="extension-list">
+            <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status">MDN HTTP response status codes</a>：补齐 201、302、400、404、410、429、5xx 的语义。</li>
+            <li><a href="https://www.hellointerview.com/learn/system-design/core-concepts/data-modeling">Data Modeling</a>：明天用 API 访问路径反推数据模型。</li>
+          </ul>
+        </div>
+      </section>
+      <section>
+        <h2>今日验收</h2>
+        <table class="rubric">
+          <tr><th>产出物</th><td>API 契约表：方法、路径、请求、响应、状态码、错误行为、重试说明。</td></tr>
+          <tr><th>必须掌握</th><td>POST 不天然幂等。GET 跳转读取状态并返回 HTTP 302。链接可能过期或变化时，301 有缓存风险。</td></tr>
+          <tr><th>安全边界</th><td>不要信任请求体里的 user_id；身份只能来自认证上下文。</td></tr>
+          <tr><th>修复规则</th><td>接口名如果像动词动作，改成资源名；如果错误码影响客户端行为，就必须写出来。</td></tr>
+        </table>
+        <h2 style="margin-top:28px">算法模块</h2>
+        <div class="algo-pack">
+          <div class="tag-row"><span>NeetCode Tag：Arrays & Hashing</span><span>层级：Prefix / Encoding</span></div>
+          <p class="algo-why">简介：继续 Arrays & Hashing，练更结构化的状态表达：前后缀数组、可逆编码、哈希签名复盘。</p>
+          <p class="algo-line"><a href="https://leetcode.com/problems/product-of-array-except-self/">必做：Product of Array Except Self</a><a href="https://neetcode.io/problems/string-encode-and-decode">必做：Encode and Decode Strings</a><a href="https://leetcode.com/problems/group-anagrams/">复盘：Group Anagrams</a></p>
+          <div class="mini-title">选做热门题</div>
+          <p class="algo-line"><a href="https://leetcode.com/problems/find-pivot-index/">Find Pivot Index</a><a href="https://leetcode.com/problems/string-compression/">String Compression</a><a href="https://leetcode.com/problems/insert-delete-getrandom-o1/">Insert Delete GetRandom O(1)</a></p>
+        </div>
+      </section>
+    </div>
+    <footer class="footer">第 3 天通过条件：你可以从 API 契约自然推出架构，而不是靠背图。</footer>
+  </main>
+</body>
+</html>

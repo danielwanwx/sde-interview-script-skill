@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>第 2 周第 1 天 - 先把读路径拆开</title><link rel="stylesheet" href="../week1/style.css"></head>
+<body>
+  <header class="topbar"><nav class="shell nav"><a class="brand" href="../week2-action-guide.html"><span class="mark"></span> 第 2 周</a><div class="navlinks"><a href="../week2-action-guide.html">周概览</a><a href="day-2.html">下一天</a><a href="scorecard.html">评分表</a></div></nav></header>
+  <main class="shell">
+    <section class="day-hero"><div class="eyebrow">第 2 周 · 第 1 天 · 2026-07-06 周一 · Read Scaling</div><h1>先把读路径拆开</h1><p class="deck">从缓存和读扩展开始，理解为什么大多数系统先被读路径压垮。</p><div class="day-meta"><span>系统设计 100 分钟</span><span>算法 75 分钟</span><span>复盘 10 分钟</span></div></section>
+    <div class="ops-grid">
+      <section><h2>学习源包</h2>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/core-concepts/caching">Caching</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Cache Aside</li><li>Write Through / Write Back</li><li>Eviction Policies</li></ul>
+          <div class="proof">验收：能区分 cache aside、write through、write back。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/patterns/scaling-reads">Scaling Reads</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Read Replicas</li><li>Caching</li><li>CDN</li></ul>
+          <div class="proof">验收：能说明 cache、replica、CDN 的位置和风险。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://ddia.vonng.com/ch6/">第六章：复制</a><span>DDIA</span></div>
+          <ul class="source-sections"><li>主从复制</li><li>复制延迟</li><li>多主复制</li></ul>
+          <div class="proof">验收：用复制延迟解释 stale read。</div>
+        </div><div class="extension-block"><div class="mini-title">拓展阅读</div><ul class="extension-list"><li><a href="https://www.designgurus.io/course/grokking-system-design-fundamentals">Grokking System Design Fundamentals</a>：只看 caching / load balancing / scalability fundamentals。</li></ul></div></section>
+      <section><h2>今日验收</h2><table class="rubric"><tr><th>产出物</th><td>画一个 read-heavy 服务的 cache-aside 读路径。</td></tr><tr><th>必须掌握</th><td>能解释 cache hit、miss、stampede、TTL、stale read。</td></tr><tr><th>修复规则</th><td>如果只会说“加 Redis”，重写为具体读路径和失效策略。</td></tr></table><h2 style="margin-top:28px">算法模块</h2><div class="algo-pack"><div class="tag-row"><span>NeetCode Tag：Two Pointers</span><span>基础模板</span></div><p class="algo-why">简介：本周刷完 Two Pointers。今天先练左右指针和有序数组基础。</p><p class="algo-line"><a href="https://leetcode.com/problems/valid-palindrome/">必做：Valid Palindrome</a><a href="https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/">必做：Two Sum II</a><a href="https://leetcode.com/problems/contains-duplicate/">复盘：Contains Duplicate</a></p><div class="mini-title">选做热门题</div><p class="algo-line"><a href="https://leetcode.com/problems/move-zeroes/">选做：Move Zeroes</a><a href="https://leetcode.com/problems/remove-duplicates-from-sorted-array/">选做：Remove Duplicates from Sorted Array</a><a href="https://leetcode.com/problems/reverse-string/">选做：Reverse String</a></p></div></section>
+    </div>
+    <footer class="footer">第 2 周第 1 天通过条件：产出物可口述，算法题位有记录，最低信心点已写入 repair。</footer>
+  </main>
+</body>
+</html>

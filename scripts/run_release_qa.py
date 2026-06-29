@@ -147,19 +147,24 @@ REQUIRED_JSON_FILES = [
     ".agents/plugins/marketplace.json",
     ".cursor-plugin/marketplace.json",
     ".claude-plugin/marketplace.json",
-    "plugins/sde-interview-script-skill/.codex-plugin/plugin.json",
-    "plugins/sde-interview-script-skill/.cursor-plugin/plugin.json",
-    "plugins/sde-interview-script-skill/.claude-plugin/plugin.json",
-    "plugins/sde-interview-script-skill/.mcp.json",
-    "plugins/sde-interview-script-skill/mcp.json",
+    "plugins/crack-system-interview-skill/.codex-plugin/plugin.json",
+    "plugins/crack-system-interview-skill/.cursor-plugin/plugin.json",
+    "plugins/crack-system-interview-skill/.claude-plugin/plugin.json",
+    "plugins/crack-system-interview-skill/.mcp.json",
+    "plugins/crack-system-interview-skill/mcp.json",
 ]
 
 REQUIRED_PATHS = [
     "card/SKILL.md",
     "senior-sde-interview-script/SKILL.md",
-    "plugins/sde-interview-script-skill/commands/card.md",
-    "plugins/sde-interview-script-skill/skills/card/SKILL.md",
-    "plugins/sde-interview-script-skill/skills/senior-sde-interview-script/SKILL.md",
+    "system-design-study-coach/SKILL.md",
+    "plugins/crack-system-interview-skill/commands/card.md",
+    "plugins/crack-system-interview-skill/skills/card/SKILL.md",
+    "plugins/crack-system-interview-skill/skills/senior-sde-interview-script/SKILL.md",
+    "plugins/crack-system-interview-skill/skills/system-design-study-coach/SKILL.md",
+    "plugins/crack-system-interview-skill/skills/system-design-study-coach/scripts/plan_lookup.py",
+    "docs/index.html",
+    "docs/system-design-14-week-master-plan.html",
     "scripts/fetch_url_text.py",
     "scripts/render_interview_card.py",
     "scripts/run_hello_interview_visual_smoke.py",
@@ -168,14 +173,14 @@ REQUIRED_PATHS = [
 
 URL_FETCH_COPIES = [
     "card/scripts/fetch_url_text.py",
-    "plugins/sde-interview-script-skill/skills/card/scripts/fetch_url_text.py",
+    "plugins/crack-system-interview-skill/skills/card/scripts/fetch_url_text.py",
 ]
 
 RENDERER_COPIES = [
     "card/scripts/render_interview_card.py",
     "senior-sde-interview-script/scripts/render_interview_card.py",
-    "plugins/sde-interview-script-skill/skills/card/scripts/render_interview_card.py",
-    "plugins/sde-interview-script-skill/skills/senior-sde-interview-script/scripts/render_interview_card.py",
+    "plugins/crack-system-interview-skill/skills/card/scripts/render_interview_card.py",
+    "plugins/crack-system-interview-skill/skills/senior-sde-interview-script/scripts/render_interview_card.py",
 ]
 
 

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>第 2 周第 5 天 - 做一版完整缓存系统</title><link rel="stylesheet" href="../week1/style.css"></head>
+<body>
+  <header class="topbar"><nav class="shell nav"><a class="brand" href="../week2-action-guide.html"><span class="mark"></span> 第 2 周</a><div class="navlinks"><a href="day-4.html">上一天</a><a href="day-6.html">下一天</a><a href="scorecard.html">评分表</a></div></nav></header>
+  <main class="shell">
+    <section class="day-hero"><div class="eyebrow">第 2 周 · 第 5 天 · 2026-07-10 周五 · Distributed Cache</div><h1>做一版完整缓存系统</h1><p class="deck">今天从 key routing、replication、eviction、consistency、failure 角度完整讲 distributed cache。</p><div class="day-meta"><span>系统设计 110 分钟</span><span>算法 75 分钟</span><span>复盘 10 分钟</span></div></section>
+    <div class="ops-grid">
+      <section><h2>学习源包</h2>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/problem-breakdowns/distributed-cache">Distributed Cache</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Consistent Hashing</li><li>Replication</li><li>Eviction</li></ul>
+          <div class="proof">验收：能讲客户端路由、服务端路由、cache cluster。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/core-concepts/caching">Caching</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Cache Aside</li><li>Write Through / Write Back</li><li>Eviction Policies</li></ul>
+          <div class="proof">验收：把 eviction 和 consistency 风险讲清。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://ddia.vonng.com/ch7/">第七章：分区</a><span>DDIA</span></div>
+          <ul class="source-sections"><li>分区键</li><li>二级索引</li><li>再平衡</li></ul>
+          <div class="proof">验收：用分区和再平衡解释扩缩容。</div>
+        </div><div class="extension-block"><div class="mini-title">拓展阅读</div><ul class="extension-list"><li><a href="https://ddia.vonng.com/ch7/">第七章：分区</a>：读分区再平衡与热点处理。</li></ul></div></section>
+      <section><h2>今日验收</h2><table class="rubric"><tr><th>产出物</th><td>完成 Distributed Cache 的 HLD 和两个 deep dive：consistent hashing、eviction/TTL。</td></tr><tr><th>必须掌握</th><td>能解释 cache miss storm、hot key、node failure、replica。</td></tr><tr><th>修复规则</th><td>如果没有 failure path，补节点故障、重平衡、读降级。</td></tr></table><h2 style="margin-top:28px">算法模块</h2><div class="algo-pack"><div class="tag-row"><span>NeetCode Tag：Two Pointers</span><span>综合练习</span></div><p class="algo-why">简介：Two Pointers 核心题进入限时综合，检查模板能否迁移。</p><p class="algo-line"><a href="https://leetcode.com/problems/boats-to-save-people/">必做：Boats to Save People</a><a href="https://leetcode.com/problems/backspace-string-compare/">必做：Backspace String Compare</a><a href="https://leetcode.com/problems/4sum/">复盘：4Sum</a></p><div class="mini-title">选做热门题</div><p class="algo-line"><a href="https://leetcode.com/problems/move-zeroes/">选做：Move Zeroes Speed Run</a><a href="https://leetcode.com/problems/valid-palindrome/">选做：Valid Palindrome Speed Run</a><a href="https://leetcode.com/problems/sort-colors/">选做：Sort Colors Review</a></p></div></section>
+    </div>
+    <footer class="footer">第 2 周第 5 天通过条件：产出物可口述，算法题位有记录，最低信心点已写入 repair。</footer>
+  </main>
+</body>
+</html>

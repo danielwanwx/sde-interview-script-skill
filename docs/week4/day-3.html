@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>第 4 周第 3 天 - 设计 FB Live Comments</title><link rel="stylesheet" href="../week1/style.css"></head>
+<body>
+  <header class="topbar"><nav class="shell nav"><a class="brand" href="../week4-action-guide.html"><span class="mark"></span> 第 4 周</a><div class="navlinks"><a href="day-2.html">上一天</a><a href="day-4.html">下一天</a><a href="scorecard.html">评分表</a></div></nav></header>
+  <main class="shell">
+    <section class="day-hero"><div class="eyebrow">第 4 周 · 第 3 天 · 2026-07-22 周三 · Data Model</div><h1>设计 FB Live Comments</h1><p class="deck">设计 FB Live Comments：房间订阅、评论写入、fanout、热门房间扩容。</p><div class="day-meta"><span>系统设计 100 分钟</span><span>算法 75 分钟</span><span>复盘 10 分钟</span></div></section>
+    <div class="ops-grid">
+      <section><h2>学习源包</h2>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-live-comments">FB Live Comments</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Realtime Fanout</li><li>Ordering</li><li>Scale</li></ul>
+          <div class="proof">验收：能讲评论 fanout、热直播间、排序。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/deep-dives/realtime-updates">Real-time Updates</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>WebSockets</li><li>Presence</li><li>Fanout</li></ul>
+          <div class="proof">验收：能处理 presence 和高并发连接。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/patterns/scaling-writes">Scaling Writes</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Sharding</li><li>Queues</li><li>Batching</li></ul>
+          <div class="proof">验收：能用批处理/队列削峰。</div>
+        </div><div class="extension-block"><div class="mini-title">拓展阅读</div><ul class="extension-list"><li><a href="https://www.designgurus.io/course/grokking-the-system-design-interview">Grokking the System Design Interview</a>：对照 Grokking 的同类 case study。</li><li><a href="https://bytebytego.com/">ByteByteGo System Design</a>：用 Alex Xu / ByteByteGo 图解校准表达。</li></ul></div></section>
+      <section><h2>今日验收</h2><table class="rubric"><tr><th>产出物</th><td>设计 FB Live Comments：房间订阅、评论写入、fanout、热门房间扩容。</td></tr><tr><th>必须掌握</th><td>必须讲清每个直播间的消息顺序和丢包/重放策略。</td></tr><tr><th>修复规则</th><td>如果没有 hot room 策略，补分片与降级。</td></tr></table><h2 style="margin-top:28px">算法模块</h2><div class="algo-pack"><div class="tag-row"><span>NeetCode Tag：Sliding Window</span><span>排列匹配</span></div><p class="algo-why">继续 Sliding Window，练固定长度匹配。</p><p class="algo-line"><a href="https://leetcode.com/problems/permutation-in-string/">必做：Permutation in String</a><a href="https://leetcode.com/problems/find-all-anagrams-in-a-string/">必做：Find All Anagrams in a String</a><a href="https://leetcode.com/problems/longest-repeating-character-replacement/">必做：复盘</a></p><div class="mini-title">选做热门题</div><p class="algo-line"><a href="https://leetcode.com/problems/repeated-dna-sequences/">选做：Repeated DNA Sequences</a><a href="https://leetcode.com/problems/subarrays-with-k-different-integers/">选做：Subarrays with K Different Integers</a><a href="https://leetcode.com/problems/number-of-substrings-containing-all-three-characters/">选做：Number of Substrings</a></p></div></section>
+    </div>
+    <footer class="footer">第 4 周第 3 天通过条件：产出物可口述，算法题位有记录，最低信心点已写入 repair。</footer>
+  </main>
+</body>
+</html>

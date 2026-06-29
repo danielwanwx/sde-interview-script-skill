@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>第 1 周评分表</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar"><nav class="shell nav"><a class="brand" href="../week1-action-guide.html"><span class="mark"></span> 第 1 周</a><div class="navlinks"><a href="day-7-mock.html">第 7 天</a><a href="../week1-action-guide.html">周概览</a></div></nav></header>
+  <main class="shell">
+    <section class="day-hero">
+      <div class="eyebrow">第 1 周最终闸门 · 设计 Bitly</div>
+      <h1>像面试官一样给答案打分</h1>
+      <p class="deck">评分表故意严格。通过代表基础足够进入更难系统；未通过代表下一周先修复，不急着加新内容。</p>
+    </section>
+    <section class="section">
+      <table class="rubric">
+        <tr><th>维度</th><th>分值</th><th>通过信号</th></tr>
+        <tr><td>需求边界</td><td>15</td><td>能列出 3-4 个核心功能需求、量化非功能需求、明确暂缓范围，并说出读写不对称。</td></tr>
+        <tr><td>API 契约</td><td>15</td><td>覆盖 POST /urls、GET /{short_code}、302 vs 301、过期链接 410、重试/幂等与认证假设。</td></tr>
+        <tr><td>数据模型</td><td>15</td><td>给出 url_mappings 表、short_code 唯一索引、过期行为，并区分真实来源与缓存。</td></tr>
+        <tr><td>高层设计与请求路径</td><td>20</td><td>创建流程和跳转流程分开；能解释缓存命中/未命中、数据库回退、读写服务拆分、302 响应。</td></tr>
+        <tr><td>深挖能力</td><td>25</td><td>短码生成策略、hash vs counter/base62 取舍、快速跳转策略、缓存 TTL、不过早分片。</td></tr>
+        <tr><td>沟通控制</td><td>10</td><td>时间受控、取舍清晰、不独白，能接住面试官追问并整合回主线。</td></tr>
+      </table>
+    </section>
+    <section class="section">
+      <div class="grid-3">
+        <article class="tile"><div class="kicker">通过</div><h3>75+</h3><p>进入第 2 周。最低分维度作为观察项保留。</p></article>
+        <article class="tile"><div class="kicker">边缘</div><h3>65-74</h3><p>修复最低两个维度后，重跑第 7 天模拟面试。</p></article>
+        <article class="tile"><div class="kicker">未通过</div><h3>&lt;65</h3><p>不要进入下一周。回到对应失败维度的那一天重做。</p></article>
+      </div>
+    </section>
+    <footer class="footer">高级答案必须完整、克制、量化，并能在追问下守住取舍。</footer>
+  </main>
+</body>
+</html>

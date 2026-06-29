@@ -1,6 +1,18 @@
-# SDE Interview Script Skill
+# Crack System Interview Skill
 
-A cross-agent plugin/skill package for helping users digest hard technical and interview material. It turns dense pasted text into an Excalidraw-style whiteboard sample plus a concise talk track, so the user can understand the material, rehearse an interview answer, and see how the topic could be drawn on a whiteboard.
+A cross-agent plugin/skill package for system design interview preparation. It combines diagram-first interview explanation skills with a printable 14-week system design study plan and a daily study coach.
+
+The package has three main entrypoints:
+
+- `$card` turns dense technical material into an Excalidraw-style whiteboard sample plus a concise talk track.
+- `$senior-sde-interview-script` keeps the original senior SDE interview answer workflow.
+- `$system-design-study-coach` supervises the bundled 14-week system design and algorithms plan.
+
+The printable plan is available through GitHub Pages when this repository is published as `crack-system-interview-skill`:
+
+```text
+https://danielwanwx.github.io/crack-system-interview-skill/
+```
 
 It uses native Excalidraw blocks: dashed task/constraints frames, semantic component blocks, black arrows, circles/squares/rectangles, and sticky notes for gotchas. It avoids decorative component icons by default so layout stays clean and predictable. It includes a short `$card` entrypoint for general text and a backward-compatible `$senior-sde-interview-script` entrypoint for SDE interview prep. Output language defaults to English, and users can request Chinese or another language in the prompt.
 
@@ -11,7 +23,7 @@ Most users do not need to understand the repository layout.
 Codex marketplace install:
 
 ```bash
-codex plugin marketplace add danielwanwx/sde-interview-script-skill
+codex plugin marketplace add danielwanwx/crack-system-interview-skill
 ```
 
 Then install `Script Card` from the `Script Card Skills` marketplace.
@@ -19,8 +31,8 @@ Then install `Script Card` from the `Script Card Skills` marketplace.
 Local clone, Codex standalone skill:
 
 ```bash
-git clone https://github.com/danielwanwx/sde-interview-script-skill.git
-cd sde-interview-script-skill
+git clone https://github.com/danielwanwx/crack-system-interview-skill.git
+cd crack-system-interview-skill
 scripts/install_codex_card.sh
 ```
 
@@ -33,10 +45,10 @@ FORCE=1 scripts/install_codex_card.sh
 Claude Code local testing:
 
 ```bash
-claude --plugin-dir ./plugins/sde-interview-script-skill
+claude --plugin-dir ./plugins/crack-system-interview-skill
 ```
 
-The rest of the tree is packaging and release infrastructure: `plugins/` contains the cross-host plugin package, `card/` is the standalone short skill, `senior-sde-interview-script/` is the backward-compatible preset, and `examples/` plus `scripts/` are release QA.
+The rest of the tree is packaging and release infrastructure: `plugins/` contains the cross-host plugin package, `card/` is the standalone short skill, `senior-sde-interview-script/` is the backward-compatible preset, `system-design-study-coach/` is the standalone daily study coach, `docs/` is the GitHub Pages study plan, and `examples/` plus `scripts/` are release QA.
 
 ## Simplest Usage
 
@@ -68,6 +80,18 @@ Natural language also works after installation:
 
 ```text
 Turn this into an Excalidraw card: <paste text here>
+```
+
+Daily system design study:
+
+```text
+Use $system-design-study-coach for Week 8 Day 4.
+```
+
+Check-out and repair:
+
+```text
+Use $system-design-study-coach to check my Day 4 artifact and assign repair tasks.
 ```
 
 Default output is intentionally minimal:
@@ -153,7 +177,7 @@ This is deliberately not a `rules` or `CLAUDE.md` package. Rules are too host-sp
 .agents/plugins/marketplace.json                     # Codex marketplace
 .cursor-plugin/marketplace.json                      # Cursor marketplace
 .claude-plugin/marketplace.json                      # Claude Code marketplace
-plugins/sde-interview-script-skill/
+plugins/crack-system-interview-skill/
   .codex-plugin/plugin.json
   .cursor-plugin/plugin.json
   .claude-plugin/plugin.json
@@ -168,8 +192,13 @@ plugins/sde-interview-script-skill/
     SKILL.md
     scripts/render_interview_card.py
     scripts/share_excalidraw.mjs
+  skills/system-design-study-coach/
+    SKILL.md
+    scripts/plan_lookup.py
 card/                                                # standalone short skill copy
 senior-sde-interview-script/                         # standalone skill copy
+system-design-study-coach/                           # standalone daily study coach
+docs/                                                # GitHub Pages 14-week study plan
 scripts/                                             # repo-level renderer test copy
 ```
 
@@ -305,7 +334,7 @@ node scripts/share_excalidraw.mjs --input /tmp/hello-interview-release-qa/<case>
 Add this repository as a Codex plugin marketplace:
 
 ```bash
-codex plugin marketplace add danielwanwx/sde-interview-script-skill
+codex plugin marketplace add danielwanwx/crack-system-interview-skill
 ```
 
 Then install `Script Card` from the `Script Card Skills` marketplace.
@@ -321,7 +350,7 @@ Use $card: <paste text here>
 This repo includes Cursor marketplace and plugin manifests:
 
 - `.cursor-plugin/marketplace.json`
-- `plugins/sde-interview-script-skill/.cursor-plugin/plugin.json`
+- `plugins/crack-system-interview-skill/.cursor-plugin/plugin.json`
 
 Import the repository as a Cursor plugin marketplace or team plugin source. The plugin loads:
 
@@ -336,19 +365,19 @@ After installation, paste the excerpt and ask Cursor to use `$card`. Cursor-capa
 This repo includes Claude Code marketplace and plugin manifests:
 
 - `.claude-plugin/marketplace.json`
-- `plugins/sde-interview-script-skill/.claude-plugin/plugin.json`
+- `plugins/crack-system-interview-skill/.claude-plugin/plugin.json`
 
 For local testing:
 
 ```bash
-claude --plugin-dir ./plugins/sde-interview-script-skill
+claude --plugin-dir ./plugins/crack-system-interview-skill
 ```
 
 Marketplace install flow:
 
 ```text
-/plugin marketplace add danielwanwx/sde-interview-script-skill
-/plugin install sde-interview-script-skill@sde-interview-script-skill
+/plugin marketplace add danielwanwx/crack-system-interview-skill
+/plugin install crack-system-interview-skill@crack-system-interview-skill
 ```
 
 Use the short slash command:
@@ -364,7 +393,7 @@ Claude Code terminal usually cannot inline local images, so the skill defaults t
 If you only want the skill folder:
 
 ```text
-Use $skill-installer to install https://github.com/danielwanwx/sde-interview-script-skill/tree/main/card
+Use $skill-installer to install https://github.com/danielwanwx/crack-system-interview-skill/tree/main/card
 ```
 
 Or copy `card/` manually into the host's skill directory. The longer `senior-sde-interview-script/` standalone skill remains available for explicit SDE interview prep.

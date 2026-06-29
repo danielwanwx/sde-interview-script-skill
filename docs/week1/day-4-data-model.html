@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>第 4 天 - 数据模型</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar"><nav class="shell nav"><a class="brand" href="../week1-action-guide.html"><span class="mark"></span> 第 1 周</a><div class="navlinks"><a href="day-3-api.html">上一天</a><a href="day-5-capacity.html">下一天</a><a href="scorecard.html">评分表</a></div></nav></header>
+  <main class="shell">
+    <section class="day-hero">
+      <div class="eyebrow">第 4 天 · 2026-07-02 周四 · 状态设计</div>
+      <h1>让状态服务访问路径</h1>
+      <p class="deck">Bitly 的数据模型很简单，正好暴露坏习惯。今天不做表结构装饰，重点是真实来源、索引纪律、缓存边界。</p>
+      <div class="day-meta"><span>系统设计 100 分钟</span><span>算法 80 分钟</span><span>复盘 10 分钟</span></div>
+    </section>
+    <div class="ops-grid">
+      <section>
+        <h2>学习源包</h2>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/core-concepts/data-modeling">Data Modeling</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Data Modeling in an Interview</li><li>Database Model Options</li><li>Relational Databases (SQL)</li><li>Schema Design Fundamentals</li><li>Start with Requirements</li><li>Entities, Keys & Relationships</li><li>Indexing for Access Patterns</li><li>Normalization vs Denormalization</li><li>Scaling and Sharding</li></ul>
+          <div class="proof">验收：默认从 PostgreSQL 出发，除非某个需求明确让其他模型更合理。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://ddia.vonng.com/ch3/">第三章：数据模型与查询语言</a><span>DDIA</span></div>
+          <ul class="source-sections"><li>关系模型与文档模型</li><li>多对一和多对多的关系</li></ul>
+          <div class="proof">验收：能说明数据模型选择会影响未来查询、演化成本和一致性边界。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/problem-breakdowns/bitly">Bitly</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Defining the Core Entities</li><li>High-Level Design: database stores mapping</li></ul>
+          <div class="proof">验收：产出 URL mapping table 和 index plan。</div>
+        </div>
+        <div class="extension-block">
+          <div class="mini-title">拓展阅读</div>
+          <ul class="extension-list">
+            <li><a href="https://ddia.vonng.com/ch4/">DDIA 第四章：存储与检索</a>：理解索引、读写路径和存储引擎取舍。</li>
+            <li><a href="https://www.postgresql.org/docs/current/indexes.html">PostgreSQL Indexes</a>：只看 B-tree 与唯一索引概念，不需要深挖调参。</li>
+          </ul>
+        </div>
+      </section>
+      <section>
+        <h2>今日验收</h2>
+        <table class="rubric">
+          <tr><th>产出物</th><td>url_mappings(short_code unique, long_url, creator_id, custom_alias, expires_at, created_at)，并写出访问路径到索引的映射。</td></tr>
+          <tr><th>必须掌握</th><td>short_code 是跳转查询键；expires_at 影响清理和缓存 TTL；缓存永远不是真实来源。</td></tr>
+          <tr><th>高级信号</th><td>先规范化，再按已证明的读路径做反规范化；没有明确触发条件不谈分片。</td></tr>
+          <tr><th>修复规则</th><td>任何字段如果不能绑定 API、非功能需求或运维行为，就从面试表结构里删掉。</td></tr>
+        </table>
+        <h2 style="margin-top:28px">算法模块</h2>
+        <div class="algo-pack">
+          <div class="tag-row"><span>NeetCode Tag：Arrays & Hashing</span><span>层级：Constraint / Sequence</span></div>
+          <p class="algo-why">简介：收尾 Arrays & Hashing 核心题。今天之后，这个 tag 的 NeetCode 核心题应全部见过一遍。</p>
+          <p class="algo-line"><a href="https://leetcode.com/problems/valid-sudoku/">必做：Valid Sudoku</a><a href="https://leetcode.com/problems/longest-consecutive-sequence/">必做：Longest Consecutive Sequence</a><a href="https://leetcode.com/problems/product-of-array-except-self/">复盘：Product Except Self</a></p>
+          <div class="mini-title">选做热门题</div>
+          <p class="algo-line"><a href="https://leetcode.com/problems/set-matrix-zeroes/">Set Matrix Zeroes</a><a href="https://leetcode.com/problems/spiral-matrix/">Spiral Matrix</a><a href="https://leetcode.com/problems/missing-number/">Missing Number</a></p>
+        </div>
+      </section>
+    </div>
+    <footer class="footer">第 4 天通过条件：每一块状态都有存在理由。</footer>
+  </main>
+</body>
+</html>

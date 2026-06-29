@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>第 9 周第 4 天 - 设计 Web Crawler</title><link rel="stylesheet" href="../week1/style.css"></head>
+<body>
+  <header class="topbar"><nav class="shell nav"><a class="brand" href="../week9-action-guide.html"><span class="mark"></span> 第 9 周</a><div class="navlinks"><a href="day-3.html">上一天</a><a href="day-5.html">下一天</a><a href="scorecard.html">评分表</a></div></nav></header>
+  <main class="shell">
+    <section class="day-hero"><div class="eyebrow">第 9 周 · 第 4 天 · 2026-08-27 周四 · Scale</div><h1>设计 Web Crawler</h1><p class="deck">设计 Web Crawler：frontier、去重、robots、抓取频率、内容解析。</p><div class="day-meta"><span>系统设计 105 分钟</span><span>算法 75 分钟</span><span>复盘 10 分钟</span></div></section>
+    <div class="ops-grid">
+      <section><h2>学习源包</h2>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/problem-breakdowns/web-crawler">Web Crawler</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Frontier</li><li>Deduplication</li><li>Politeness</li></ul>
+          <div class="proof">验收：能设计 URL frontier、dedupe、crawl policy。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/deep-dives/data-structures-for-big-data">Data Structures for Big Data</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Bloom Filters</li><li>Count-Min Sketch</li><li>HyperLogLog</li></ul>
+          <div class="proof">验收：能用 Bloom Filter 做 URL seen set。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://ddia.vonng.com/ch11/">第十一章：批处理</a><span>DDIA</span></div>
+          <ul class="source-sections"><li>MapReduce</li><li>物化视图</li><li>Join</li></ul>
+          <div class="proof">验收：能处理批量索引和回填。</div>
+        </div><div class="extension-block"><div class="mini-title">拓展阅读</div><ul class="extension-list"><li><a href="https://www.designgurus.io/course/grokking-the-system-design-interview">Grokking the System Design Interview</a>：对照 Grokking 的同类 case study。</li><li><a href="https://bytebytego.com/">ByteByteGo System Design</a>：用 Alex Xu / ByteByteGo 图解校准表达。</li></ul></div></section>
+      <section><h2>今日验收</h2><table class="rubric"><tr><th>产出物</th><td>设计 Web Crawler：frontier、去重、robots、抓取频率、内容解析。</td></tr><tr><th>必须掌握</th><td>能解释 polite crawling、重复 URL、失败重试。</td></tr><tr><th>修复规则</th><td>如果没有 robots/politeness，补抓取规则。</td></tr></table><h2 style="margin-top:28px">算法模块</h2><div class="algo-pack"><div class="tag-row"><span>NeetCode Tag：Backtracking</span><span>网格搜索</span></div><p class="algo-why">本周按 NeetCode 的 Backtracking block 推进。今天只处理「网格搜索」，三题都要留下 pattern、invariant、复杂度和错因。</p><p class="algo-line"><a href="https://leetcode.com/problems/word-search/">必做：Word Search</a><a href="https://leetcode.com/problems/letter-combinations-of-a-phone-number/">必做：Letter Combinations</a><a href="https://leetcode.com/problems/permutations/">复盘：Permutations</a></p><div class="mini-title">选做热门题</div><p class="algo-line"><a href="https://leetcode.com/problems/sudoku-solver/">选做：Sudoku Solver</a><a href="https://leetcode.com/problems/word-search-ii/">选做：Word Search II</a><a href="https://leetcode.com/problems/unique-paths-iii/">选做：Unique Paths III</a></p></div></section>
+    </div>
+    <footer class="footer">第 9 周第 4 天通过条件：产出物可口述，算法题位有记录，最低信心点已写入 repair。</footer>
+  </main>
+</body>
+</html>

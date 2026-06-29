@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>第 11 周第 5 天 - Robinhood 数据一致性</title><link rel="stylesheet" href="../week1/style.css"></head>
+<body>
+  <header class="topbar"><nav class="shell nav"><a class="brand" href="../week11-action-guide.html"><span class="mark"></span> 第 11 周</a><div class="navlinks"><a href="day-4.html">上一天</a><a href="day-6.html">下一天</a><a href="scorecard.html">评分表</a></div></nav></header>
+  <main class="shell">
+    <section class="day-hero"><div class="eyebrow">第 11 周 · 第 5 天 · 2026-09-11 周五 · Deep Dive</div><h1>Robinhood 数据一致性</h1><p class="deck">设计 Robinhood 数据一致性：orders、positions、ledger、market data、portfolio view。</p><div class="day-meta"><span>系统设计 110 分钟</span><span>算法 75 分钟</span><span>复盘 10 分钟</span></div></section>
+    <div class="ops-grid">
+      <section><h2>学习源包</h2>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/problem-breakdowns/robinhood">Robinhood</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Orders</li><li>Portfolio</li><li>Market Data</li></ul>
+          <div class="proof">验收：能设计订单、组合、市场数据。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/problem-breakdowns/payment-system">Payment System</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Idempotency</li><li>Ledger</li><li>Reconciliation</li></ul>
+          <div class="proof">验收：复用 ledger/幂等思想。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://ddia.vonng.com/ch8/">第八章：事务</a><span>DDIA</span></div>
+          <ul class="source-sections"><li>ACID</li><li>隔离级别</li><li>并发控制</li></ul>
+          <div class="proof">验收：能说明交易状态和隔离。</div>
+        </div><div class="extension-block"><div class="mini-title">拓展阅读</div><ul class="extension-list"><li><a href="https://www.designgurus.io/course/grokking-the-system-design-interview">Grokking the System Design Interview</a>：对照 Grokking 的同类 case study。</li><li><a href="https://bytebytego.com/">ByteByteGo System Design</a>：用 Alex Xu / ByteByteGo 图解校准表达。</li></ul></div></section>
+      <section><h2>今日验收</h2><table class="rubric"><tr><th>产出物</th><td>设计 Robinhood 数据一致性：orders、positions、ledger、market data、portfolio view。</td></tr><tr><th>必须掌握</th><td>必须区分交易事实、派生持仓、实时行情。</td></tr><tr><th>修复规则</th><td>如果 portfolio 直接由前端拼，补后端派生视图。</td></tr></table><h2 style="margin-top:28px">算法模块</h2><div class="algo-pack"><div class="tag-row"><span>NeetCode Tag：Advanced Graphs</span><span>欧拉/拓扑</span></div><p class="algo-why">本周按 NeetCode 的 Advanced Graphs block 推进。今天只处理「欧拉/拓扑」，三题都要留下 pattern、invariant、复杂度和错因。</p><p class="algo-line"><a href="https://leetcode.com/problems/reconstruct-itinerary/">必做：Reconstruct Itinerary</a><a href="https://leetcode.com/problems/alien-dictionary/">必做：Alien Dictionary</a><a href="https://leetcode.com/problems/cheapest-flights-within-k-stops/">复盘：Cheapest Flights</a></p><div class="mini-title">选做热门题</div><p class="algo-line"><a href="https://leetcode.com/problems/sequence-reconstruction/">选做：Sequence Reconstruction</a><a href="https://leetcode.com/problems/parallel-courses/">选做：Parallel Courses</a><a href="https://leetcode.com/problems/course-schedule-iv/">选做：Course Schedule IV</a></p></div></section>
+    </div>
+    <footer class="footer">第 11 周第 5 天通过条件：产出物可口述，算法题位有记录，最低信心点已写入 repair。</footer>
+  </main>
+</body>
+</html>

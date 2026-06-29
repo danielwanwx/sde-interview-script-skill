@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>第 2 周第 6 天 - 把缓存和限流的故障讲出来</title><link rel="stylesheet" href="../week1/style.css"></head>
+<body>
+  <header class="topbar"><nav class="shell nav"><a class="brand" href="../week2-action-guide.html"><span class="mark"></span> 第 2 周</a><div class="navlinks"><a href="day-5.html">上一天</a><a href="day-7.html">下一天</a><a href="scorecard.html">评分表</a></div></nav></header>
+  <main class="shell">
+    <section class="day-hero"><div class="eyebrow">第 2 周 · 第 6 天 · 2026-07-11 周六 · Failure Modes</div><h1>把缓存和限流的故障讲出来</h1><p class="deck">高级答案要能主动说降级：缓存挂了怎么办、Redis 热点怎么办、限流误杀怎么办。</p><div class="day-meta"><span>系统设计 100 分钟</span><span>算法 75 分钟</span><span>复盘 10 分钟</span></div></section>
+    <div class="ops-grid">
+      <section><h2>学习源包</h2>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/deep-dives/cap-theorem">CAP Theorem</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Network Partitions</li><li>Consistency Tradeoffs</li></ul>
+          <div class="proof">验收：用 partition 解释可用性和一致性取舍。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/deep-dives/redis">Redis</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Data Structures</li><li>Expiration</li><li>Replication</li></ul>
+          <div class="proof">验收：说明 Redis failover、replication、persistence 的面试粒度。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/problem-breakdowns/distributed-cache">Distributed Cache</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Consistent Hashing</li><li>Replication</li><li>Eviction</li></ul>
+          <div class="proof">验收：能说读降级和缓存恢复策略。</div>
+        </div><div class="extension-block"><div class="mini-title">拓展阅读</div><ul class="extension-list"><li><a href="https://github.com/donnemartin/system-design-primer">System Design Primer</a>：看 CAP、cache、replication failure sections。</li></ul></div></section>
+      <section><h2>今日验收</h2><table class="rubric"><tr><th>产出物</th><td>写一页故障清单：cache outage、hot key、Redis failover、network partition、over-limit false positive。</td></tr><tr><th>必须掌握</th><td>能给每个故障一个检测指标和降级策略。</td></tr><tr><th>修复规则</th><td>如果只有 happy path，重画 failure path。</td></tr></table><h2 style="margin-top:28px">算法模块</h2><div class="algo-pack"><div class="tag-row"><span>NeetCode Tag：Two Pointers</span><span>专项复盘</span></div><p class="algo-why">简介：Two Pointers 不加新题，重做错题和边界题。</p><p class="algo-line"><a href="https://leetcode.com/problems/trapping-rain-water/">复盘：Trapping Rain Water</a><a href="https://leetcode.com/problems/3sum/">限时：3Sum</a><a href="https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/">限时：Two Sum II</a></p><div class="mini-title">选做热门题</div><p class="algo-line"><a href="https://leetcode.com/problems/container-with-most-water/">选做：Container Speed Run</a><a href="https://leetcode.com/problems/valid-palindrome-ii/">选做：Valid Palindrome II</a><a href="https://leetcode.com/problems/4sum/">选做：4Sum Review</a></p></div></section>
+    </div>
+    <footer class="footer">第 2 周第 6 天通过条件：产出物可口述，算法题位有记录，最低信心点已写入 repair。</footer>
+  </main>
+</body>
+</html>

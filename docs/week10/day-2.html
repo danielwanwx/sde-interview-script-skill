@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>第 10 周第 2 天 - 设计 Uber</title><link rel="stylesheet" href="../week1/style.css"></head>
+<body>
+  <header class="topbar"><nav class="shell nav"><a class="brand" href="../week10-action-guide.html"><span class="mark"></span> 第 10 周</a><div class="navlinks"><a href="day-1.html">上一天</a><a href="day-3.html">下一天</a><a href="scorecard.html">评分表</a></div></nav></header>
+  <main class="shell">
+    <section class="day-hero"><div class="eyebrow">第 10 周 · 第 2 天 · 2026-09-01 周二 · Core Path</div><h1>设计 Uber</h1><p class="deck">设计 Uber：rider request、driver matching、location stream、trip state。</p><div class="day-meta"><span>系统设计 100 分钟</span><span>算法 75 分钟</span><span>复盘 10 分钟</span></div></section>
+    <div class="ops-grid">
+      <section><h2>学习源包</h2>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/problem-breakdowns/uber">Uber</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Matching</li><li>Geo Indexing</li><li>Realtime Location</li></ul>
+          <div class="proof">验收：能设计匹配、ETA、实时位置。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/deep-dives/realtime-updates">Real-time Updates</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>WebSockets</li><li>Presence</li><li>Fanout</li></ul>
+          <div class="proof">验收：能处理司机位置推送。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://ddia.vonng.com/ch9/">第九章：分布式系统的麻烦</a><span>DDIA</span></div>
+          <ul class="source-sections"><li>网络故障</li><li>时钟</li><li>不可靠性</li></ul>
+          <div class="proof">验收：能解释延迟和不可靠网络。</div>
+        </div><div class="extension-block"><div class="mini-title">拓展阅读</div><ul class="extension-list"><li><a href="https://www.designgurus.io/course/grokking-the-system-design-interview">Grokking the System Design Interview</a>：对照 Grokking 的同类 case study。</li><li><a href="https://bytebytego.com/">ByteByteGo System Design</a>：用 Alex Xu / ByteByteGo 图解校准表达。</li></ul></div></section>
+      <section><h2>今日验收</h2><table class="rubric"><tr><th>产出物</th><td>设计 Uber：rider request、driver matching、location stream、trip state。</td></tr><tr><th>必须掌握</th><td>能解释位置数据是短 TTL 实时状态，不是每次都落强一致 DB。</td></tr><tr><th>修复规则</th><td>如果没有 trip state machine，补状态流转。</td></tr></table><h2 style="margin-top:28px">算法模块</h2><div class="algo-pack"><div class="tag-row"><span>NeetCode Tag：Graphs</span><span>克隆/连通</span></div><p class="algo-why">本周按 NeetCode 的 Graphs block 推进。今天只处理「克隆/连通」，三题都要留下 pattern、invariant、复杂度和错因。</p><p class="algo-line"><a href="https://leetcode.com/problems/clone-graph/">必做：Clone Graph</a><a href="https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/">必做：Connected Components</a><a href="https://leetcode.com/problems/graph-valid-tree/">必做：Graph Valid Tree</a></p><div class="mini-title">选做热门题</div><p class="algo-line"><a href="https://leetcode.com/problems/find-if-path-exists-in-graph/">选做：Find Path Exists</a><a href="https://leetcode.com/problems/possible-bipartition/">选做：Possible Bipartition</a><a href="https://leetcode.com/problems/keys-and-rooms/">选做：Keys and Rooms</a></p></div></section>
+    </div>
+    <footer class="footer">第 10 周第 2 天通过条件：产出物可口述，算法题位有记录，最低信心点已写入 repair。</footer>
+  </main>
+</body>
+</html>

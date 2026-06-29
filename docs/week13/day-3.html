@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>第 13 周第 3 天 - Vector DB 检索</title><link rel="stylesheet" href="../week1/style.css"></head>
+<body>
+  <header class="topbar"><nav class="shell nav"><a class="brand" href="../week13-action-guide.html"><span class="mark"></span> 第 13 周</a><div class="navlinks"><a href="day-2.html">上一天</a><a href="day-4.html">下一天</a><a href="scorecard.html">评分表</a></div></nav></header>
+  <main class="shell">
+    <section class="day-hero"><div class="eyebrow">第 13 周 · 第 3 天 · 2026-09-23 周三 · Data Model</div><h1>Vector DB 检索</h1><p class="deck">设计 Vector Search：embedding pipeline、index build、query、filter、rerank、freshness。</p><div class="day-meta"><span>系统设计 100 分钟</span><span>算法 75 分钟</span><span>复盘 10 分钟</span></div></section>
+    <div class="ops-grid">
+      <section><h2>学习源包</h2>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/deep-dives/vector-databases">Vector Databases</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Embeddings</li><li>ANN Search</li><li>Metadata Filtering</li></ul>
+          <div class="proof">验收：能讲 embedding、ANN、metadata filtering。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/deep-dives/elasticsearch">Elasticsearch</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Inverted Index</li><li>Shards</li><li>Query Execution</li></ul>
+          <div class="proof">验收：能比较 keyword search 与 vector search。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://ddia.vonng.com/ch4/">第四章：存储与检索</a><span>DDIA</span></div>
+          <ul class="source-sections"><li>索引</li><li>LSM 树</li><li>B 树</li></ul>
+          <div class="proof">验收：能连接索引和检索成本。</div>
+        </div><div class="extension-block"><div class="mini-title">拓展阅读</div><ul class="extension-list"><li><a href="https://www.designgurus.io/course/grokking-the-system-design-interview">Grokking the System Design Interview</a>：对照 Grokking 的同类 case study。</li><li><a href="https://bytebytego.com/">ByteByteGo System Design</a>：用 Alex Xu / ByteByteGo 图解校准表达。</li></ul></div></section>
+      <section><h2>今日验收</h2><table class="rubric"><tr><th>产出物</th><td>设计 Vector Search：embedding pipeline、index build、query、filter、rerank、freshness。</td></tr><tr><th>必须掌握</th><td>必须说清 metadata filter 与 ANN search 的顺序取舍。</td></tr><tr><th>修复规则</th><td>如果没有离线建索引和增量更新，补。</td></tr></table><h2 style="margin-top:28px">算法模块</h2><div class="algo-pack"><div class="tag-row"><span>NeetCode Tag：1-D DP</span><span>零钱/背包</span></div><p class="algo-why">本周按 NeetCode 的 1-D DP block 推进。今天只处理「零钱/背包」，三题都要留下 pattern、invariant、复杂度和错因。</p><p class="algo-line"><a href="https://leetcode.com/problems/coin-change/">必做：Coin Change</a><a href="https://leetcode.com/problems/partition-equal-subset-sum/">必做：Partition Equal Subset Sum</a><a href="https://leetcode.com/problems/house-robber-ii/">复盘：House Robber II</a></p><div class="mini-title">选做热门题</div><p class="algo-line"><a href="https://leetcode.com/problems/coin-change-ii/">选做：Coin Change II</a><a href="https://leetcode.com/problems/target-sum/">选做：Target Sum</a><a href="https://leetcode.com/problems/ones-and-zeroes/">选做：Ones and Zeroes</a></p></div></section>
+    </div>
+    <footer class="footer">第 13 周第 3 天通过条件：产出物可口述，算法题位有记录，最低信心点已写入 repair。</footer>
+  </main>
+</body>
+</html>

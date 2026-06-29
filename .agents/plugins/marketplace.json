@@ -1,14 +1,14 @@
 {
-  "name": "sde-interview-script-skill",
+  "name": "crack-system-interview-skill",
   "interface": {
-    "displayName": "Script Card Skills"
+    "displayName": "Crack System Interview Skills"
   },
   "plugins": [
     {
-      "name": "sde-interview-script-skill",
+      "name": "crack-system-interview-skill",
       "source": {
         "source": "local",
-        "path": "./plugins/sde-interview-script-skill"
+        "path": "./plugins/crack-system-interview-skill"
       },
       "policy": {
         "installation": "AVAILABLE",

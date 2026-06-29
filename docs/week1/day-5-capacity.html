@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>第 5 天 - 容量判断</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar"><nav class="shell nav"><a class="brand" href="../week1-action-guide.html"><span class="mark"></span> 第 1 周</a><div class="navlinks"><a href="day-4-data-model.html">上一天</a><a href="day-6-hld.html">下一天</a><a href="scorecard.html">评分表</a></div></nav></header>
+  <main class="shell">
+    <section class="day-hero">
+      <div class="eyebrow">第 5 天 · 2026-07-03 周五 · 扩展判断</div>
+      <h1>用数字删除多余架构</h1>
+      <p class="deck">估算的目的不是炫算术，而是保持架构克制。今天要学会判断单库加缓存什么时候足够，以及什么信号才真的迫使横向扩展。</p>
+      <div class="day-meta"><span>系统设计 95 分钟</span><span>算法 75 分钟</span><span>复盘 10 分钟</span></div>
+    </section>
+    <div class="ops-grid">
+      <section>
+        <h2>学习源包</h2>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/core-concepts/numbers-to-know">Numbers to Know</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Modern Hardware Limits</li><li>Applying These Numbers in System Design Interviews</li><li>Caching</li><li>Databases</li><li>Cheat Sheet</li><li>Common Mistakes In Interviews</li></ul>
+          <div class="proof">验收：掌握数量级限制，用来阻止过早分片。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/problem-breakdowns/bitly">Bitly</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>3) How can we scale to support 1B shortened urls and 100M DAU?</li><li>But what if the DB goes down?</li><li>But what about our counter?</li></ul>
+          <div class="proof">验收：能估出 10 亿条映射约 500GB，并能为 PostgreSQL + 缓存作为起点辩护。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://ddia.vonng.com/ch2/">第二章：数据系统的目标</a><span>DDIA</span></div>
+          <ul class="source-sections"><li>延迟与响应时间</li><li>可伸缩性</li></ul>
+          <div class="proof">验收：把延迟与吞吐翻译成 Bitly 的具体非功能需求。</div>
+        </div>
+        <div class="extension-block">
+          <div class="mini-title">拓展阅读</div>
+          <ul class="extension-list">
+            <li><a href="https://www.hellointerview.com/learn/system-design/in-a-hurry/key-technologies">Key Technologies</a>：只看 Distributed Cache / CDN / Database 的定位。</li>
+            <li><a href="https://ddia.vonng.com/ch4/">DDIA 第四章：存储与检索</a>：用存储引擎和索引成本校准容量判断。</li>
+          </ul>
+        </div>
+      </section>
+      <section>
+        <h2>今日验收</h2>
+        <table class="rubric">
+          <tr><th>产出物</th><td>容量估算表：日活、读写比例、单行大小、存储量、缓存理由、扩展触发条件。</td></tr>
+          <tr><th>必须掌握</th><td>10 亿条 URL 映射约 500GB。这个数字本身不足以证明需要分片。</td></tr>
+          <tr><th>触发条件</th><td>写入吞吐、读延迟、缓存命中率、备份窗口、地理分布、故障恢复。</td></tr>
+          <tr><th>修复规则</th><td>估算如果不改变设计就删掉；如果你说“太大”，必须指出具体组件限制。</td></tr>
+        </table>
+        <h2 style="margin-top:28px">算法模块</h2>
+        <div class="algo-pack">
+          <div class="tag-row"><span>NeetCode Tag：Arrays & Hashing</span><span>层级：高频扩展 / Prefix Hash</span></div>
+          <p class="algo-why">简介：不切换 tag。核心题过完后，用同类高频题补强哈希表、前缀和、投票计数。</p>
+          <p class="algo-line"><a href="https://leetcode.com/problems/subarray-sum-equals-k/">必做：Subarray Sum Equals K</a><a href="https://leetcode.com/problems/majority-element/">必做：Majority Element</a><a href="https://leetcode.com/problems/longest-consecutive-sequence/">复盘：Longest Consecutive</a></p>
+          <div class="mini-title">选做热门题</div>
+          <p class="algo-line"><a href="https://leetcode.com/problems/continuous-subarray-sum/">Continuous Subarray Sum</a><a href="https://leetcode.com/problems/check-if-array-pairs-are-divisible-by-k/">Array Pairs Divisible by K</a><a href="https://leetcode.com/problems/find-all-duplicates-in-an-array/">Find All Duplicates in an Array</a></p>
+        </div>
+      </section>
+    </div>
+    <footer class="footer">第 5 天通过条件：你的估算能约束架构，而不是装饰答案。</footer>
+  </main>
+</body>
+</html>

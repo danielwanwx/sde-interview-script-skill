@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>第 6 天 - 高层设计与请求路径</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar"><nav class="shell nav"><a class="brand" href="../week1-action-guide.html"><span class="mark"></span> 第 1 周</a><div class="navlinks"><a href="day-5-capacity.html">上一天</a><a href="day-7-mock.html">下一天</a><a href="scorecard.html">评分表</a></div></nav></header>
+  <main class="shell">
+    <section class="day-hero">
+      <div class="eyebrow">第 6 天 · 2026-07-04 周六 · 架构组装</div>
+      <h1>画请求路径，不画海报</h1>
+      <p class="deck">高层设计只有在每条箭头都承载请求、状态变化或失败模式时才有价值。今天把创建流程与跳转流程分开，并加固读路径。</p>
+      <div class="day-meta"><span>系统设计 110 分钟</span><span>算法 80 分钟</span><span>复盘 10 分钟</span></div>
+    </section>
+    <div class="ops-grid">
+      <section>
+        <h2>学习源包</h2>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/core-concepts/networking-essentials">Networking Essentials</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Networking 101</li><li>Network Layer (Layer 3)</li><li>Transport Layer (Layer 4)</li><li>Application Layer (Layer 7)</li><li>Example: A Simple Web Request</li><li>HTTP/HTTPS: The Web's Foundation</li></ul>
+          <div class="proof">验收：能用系统设计需要的粒度解释 DNS、TCP、HTTP、跳转。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/in-a-hurry/key-technologies">Key Technologies</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Distributed Cache</li><li>CDN</li></ul>
+          <div class="proof">验收：知道什么数据适合缓存/CDN，TTL 与失效风险在哪里。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/problem-breakdowns/bitly">Bitly</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>High-Level Design</li><li>2) Users should be able to access the original URL by using the shortened URL</li><li>2) How can we ensure that redirects are fast?</li></ul>
+          <div class="proof">验收：分别画创建与跳转；跳转包含缓存命中、缓存未命中、数据库查询、302 响应。</div>
+        </div>
+        <div class="extension-block">
+          <div class="mini-title">拓展阅读</div>
+          <ul class="extension-list">
+            <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections">MDN HTTP redirections</a>：补齐 301/302/307/308 的缓存和语义差异。</li>
+            <li><a href="https://www.hellointerview.com/learn/system-design/core-concepts/numbers-to-know">Numbers to Know</a>：回看缓存、数据库、网络延迟数量级。</li>
+          </ul>
+        </div>
+      </section>
+      <section>
+        <h2>今日验收</h2>
+        <table class="rubric">
+          <tr><th>产出物</th><td>高层设计图 + 编号跳转请求路径：客户端、DNS/LB/CDN、读服务、缓存、数据库、302。</td></tr>
+          <tr><th>必须掌握</th><td>读服务与写服务可以独立扩展；计数器协调属于写路径，不属于跳转热路径。</td></tr>
+          <tr><th>高级信号</th><td>比较哈希碰撞处理与 counter/base62 协调方案，并能提到 counter batching。</td></tr>
+          <tr><th>修复规则</th><td>如果图只是盒子清单，立刻改写成两条流程：创建短链接与解析短链接。</td></tr>
+        </table>
+        <h2 style="margin-top:28px">算法模块</h2>
+        <div class="algo-pack">
+          <div class="tag-row"><span>NeetCode Tag：Arrays & Hashing</span><span>层级：频率排序 / 集合关系</span></div>
+          <p class="algo-why">简介：继续同一个 tag，补同类热门题。重点是频率排序、集合交集、Top K 复盘。</p>
+          <p class="algo-line"><a href="https://leetcode.com/problems/sort-characters-by-frequency/">必做：Sort Characters By Frequency</a><a href="https://leetcode.com/problems/intersection-of-two-arrays/">必做：Intersection of Two Arrays</a><a href="https://leetcode.com/problems/top-k-frequent-elements/">复盘：Top K Frequent Elements</a></p>
+          <div class="mini-title">选做热门题</div>
+          <p class="algo-line"><a href="https://leetcode.com/problems/intersection-of-two-arrays-ii/">Intersection of Two Arrays II</a><a href="https://leetcode.com/problems/unique-number-of-occurrences/">Unique Number of Occurrences</a><a href="https://leetcode.com/problems/first-unique-character-in-a-string/">First Unique Character in a String</a></p>
+        </div>
+      </section>
+    </div>
+    <footer class="footer">第 6 天通过条件：架构能从 API 与状态自然推出，不靠背盒子。</footer>
+  </main>
+</body>
+</html>

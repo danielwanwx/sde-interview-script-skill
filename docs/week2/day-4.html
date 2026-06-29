@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>第 2 周第 4 天 - 掌握限流算法</title><link rel="stylesheet" href="../week1/style.css"></head>
+<body>
+  <header class="topbar"><nav class="shell nav"><a class="brand" href="../week2-action-guide.html"><span class="mark"></span> 第 2 周</a><div class="navlinks"><a href="day-3.html">上一天</a><a href="day-5.html">下一天</a><a href="scorecard.html">评分表</a></div></nav></header>
+  <main class="shell">
+    <section class="day-hero"><div class="eyebrow">第 2 周 · 第 4 天 · 2026-07-09 周四 · Rate Limiter</div><h1>掌握限流算法</h1><p class="deck">把固定窗口、滑动窗口、token bucket、leaky bucket 的行为和成本讲清。</p><div class="day-meta"><span>系统设计 105 分钟</span><span>算法 75 分钟</span><span>复盘 10 分钟</span></div></section>
+    <div class="ops-grid">
+      <section><h2>学习源包</h2>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/problem-breakdowns/distributed-rate-limiter">Rate Limiter</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Algorithms</li><li>Redis</li><li>Consistency</li></ul>
+          <div class="proof">验收：能给 user/IP/API key 三种维度建模。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/patterns/scaling-writes">Scaling Writes</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Sharding</li><li>Queues</li><li>Batching</li></ul>
+          <div class="proof">验收：理解全局限流的写压力和热点。</div>
+        </div>
+        <div class="source-block">
+          <div class="source-title"><a href="https://www.hellointerview.com/learn/system-design/core-concepts/cap-theorem">CAP Theorem</a><span>Hello Interview</span></div>
+          <ul class="source-sections"><li>Consistency</li><li>Availability</li><li>Partition Tolerance</li></ul>
+          <div class="proof">验收：能解释强一致全局限流的成本。</div>
+        </div><div class="extension-block"><div class="mini-title">拓展阅读</div><ul class="extension-list"><li><a href="https://www.designgurus.io/course/grokking-the-system-design-interview">Grokking the System Design Interview</a>：对照 Grokking 的 rate limiter case study。</li></ul></div></section>
+      <section><h2>今日验收</h2><table class="rubric"><tr><th>产出物</th><td>产出 Rate Limiter 方案：API、Redis schema、算法选择、分布式一致性风险。</td></tr><tr><th>必须掌握</th><td>能比较 fixed window、sliding window、token bucket。</td></tr><tr><th>修复规则</th><td>如果没有说明跨 region 一致性，补充本地限流 + 全局配额策略。</td></tr></table><h2 style="margin-top:28px">算法模块</h2><div class="algo-pack"><div class="tag-row"><span>NeetCode Tag：Two Pointers</span><span>去重和边界</span></div><p class="algo-why">简介：继续 Two Pointers，重点是去重和边界条件。</p><p class="algo-line"><a href="https://leetcode.com/problems/4sum/">必做：4Sum</a><a href="https://leetcode.com/problems/remove-duplicates-from-sorted-array/">必做：Remove Duplicates from Sorted Array</a><a href="https://leetcode.com/problems/container-with-most-water/">复盘：Container Review</a></p><div class="mini-title">选做热门题</div><p class="algo-line"><a href="https://leetcode.com/problems/valid-palindrome-ii/">选做：Valid Palindrome II</a><a href="https://leetcode.com/problems/sort-array-by-parity/">选做：Sort Array By Parity</a><a href="https://leetcode.com/problems/partition-array-according-to-given-pivot/">选做：Partition Array According to Given Pivot</a></p></div></section>
+    </div>
+    <footer class="footer">第 2 周第 4 天通过条件：产出物可口述，算法题位有记录，最低信心点已写入 repair。</footer>
+  </main>
+</body>
+</html>
